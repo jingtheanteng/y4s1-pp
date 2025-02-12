@@ -13,6 +13,7 @@ import EditProfile from './Page/EditProfile';
 import DepartmentCommunity from './Page/DepartmentCommunity';
 import PostDetail from './Page/PostDetail';
 import ViewProfile from './Page/ViewProfile';
+import LoggedIn from './Page/LoggedIn';
 
 function App() {
     return (
@@ -32,6 +33,7 @@ function App() {
                 <Route path="/department-community" element={<DepartmentCommunity />} />
                 <Route path="/post-detail" element={<PostDetail />} />
                 <Route path="/view-profile" element={<ViewProfile />} />
+                <Route path="/home-loggedin" element={<LoggedIn />} />
             </Routes>
         </Router>
     );

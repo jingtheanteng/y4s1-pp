@@ -4,7 +4,7 @@ import { FaSearch, FaBell, FaCog } from "react-icons/fa";
 import { MdHomeFilled } from "react-icons/md";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { RiArrowDropDownLine } from "react-icons/ri";
-
+import '../App.css';
 
 function EditProfile() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -13,7 +13,6 @@ function EditProfile() {
     const location = useLocation();
 
     const handleSignInClick = () => navigate('/loginregister');
-    const handleSignUpClick = () => navigate('/loginregister');
     const handleHomeClick = () => navigate('/');
     const handleCommunitiesClick = () => navigate('/communities');
     const handleProfileClick = () => navigate('/profile');
@@ -40,7 +39,7 @@ function EditProfile() {
     return (
         <div className="bg-white-100 text-white font-sans min-h-screen flex flex-col">
             {/* Header */}
-            <header className="bg-blue-700 p-4">
+            <header className="bg-blue-700 p-4 sticky-header">
                 <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center">
                     <div className="flex items-center space-x-4 mb-4 lg:mb-0">
                         <img src="logo.png" alt="Knowledgechain" className="w-10 h-10" />
@@ -87,12 +86,6 @@ function EditProfile() {
                             className="bg-orange-500 px-4 py-2 rounded-md w-full lg:w-auto"
                         >
                             Sign In
-                        </button>
-                        <button
-                            onClick={handleSignUpClick}
-                            className="bg-orange-500 px-4 py-2 rounded-md w-full lg:w-auto"
-                        >
-                            Sign Up
                         </button>
                     </div>
                 </div>

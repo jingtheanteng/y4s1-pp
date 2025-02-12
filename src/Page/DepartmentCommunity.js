@@ -4,6 +4,7 @@ import { FaSearch, FaBell, FaCog, FaHeart } from "react-icons/fa";
 import { MdHomeFilled } from "react-icons/md";
 import { useNavigate} from 'react-router-dom';
 import { CgAttachment } from "react-icons/cg";
+import '../App.css';
 
 function DepartmentCommunity() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -49,7 +50,7 @@ function DepartmentCommunity() {
     return (
         <div className="bg-white-900 text-white font-sans min-h-screen flex flex-col">
             {/* Header */}
-            <header className="bg-blue-700 p-4">
+            <header className="bg-blue-700 p-4 sticky-header">
                 <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center">
                     <div className="flex items-center space-x-4 mb-4 lg:mb-0">
                         <img src="logo.png" alt="Knowledgechain" className="w-10 h-10" />

@@ -4,6 +4,7 @@ import { RiLockPasswordLine } from "react-icons/ri";
 import { FaEye, FaEyeSlash, FaSearch, FaBell, FaCog } from "react-icons/fa"; // Added icons
 import { FaUserLarge, FaPeopleGroup } from "react-icons/fa6";
 import { MdEmail, MdHomeFilled } from "react-icons/md";
+import '../App.css';
 
 const LoginRegister = () => {
     const [isSignUp, setIsSignUp] = useState(false);
@@ -14,8 +15,19 @@ const LoginRegister = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log(isSignUp ? "Signing up..." : "Logging in...");
+        
+        // Simulating successful login
+        const isAuthenticated = true; // Replace with actual authentication logic
+        
+        if (isAuthenticated) {
+            console.log("Logging in...");
+            navigate('/home-loggedin'); // Navigate to /home-loggedin
+        } else {
+            console.log("Login failed.");
+            alert("Invalid credentials. Please try again.");
+        }
     };
+    
 
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible); // Toggle password visibility
@@ -48,7 +60,7 @@ const LoginRegister = () => {
     return (
         <div className="bg-white-500 text-white font-sans min-h-screen flex flex-col">
             {/* Header */}
-            <header className="bg-blue-700 p-4">
+            <header className="bg-blue-700 p-4 sticky-header">
                 <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center">
                     <div className="flex items-center space-x-4 mb-4 lg:mb-0">
                         <img src="logo.png" alt="Knowledgechain" className="w-10 h-10" />
@@ -188,12 +200,16 @@ const LoginRegister = () => {
 
                                     {!isSignUp && (
                                         <div className="mb-4 w-full text-left">
-                                            <button 
-                                                onClick={() => navigate('/forget-password')} 
-                                                className="text-sm text-orange-500 hover:text-orange-700">
-                                                Forgot Password?
-                                            </button>
-                                        </div>
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault(); // Prevent form submission
+                                                navigate('/forget-password'); // Navigate to the forgot password route
+                                            }}
+                                            className="text-sm text-orange-500 hover:text-orange-700"
+                                        >
+                                            Forgot Password?
+                                        </button>
+                                    </div>
                                     )}
 
                                     {isSignUp && (

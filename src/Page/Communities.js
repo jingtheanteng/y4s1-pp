@@ -3,6 +3,7 @@ import { FaUserLarge, FaPeopleGroup } from "react-icons/fa6";
 import { FaHeart, FaSearch, FaBell, FaCog } from "react-icons/fa"; // Added icons
 import { MdHomeFilled } from "react-icons/md";
 import { useNavigate, useLocation } from 'react-router-dom';
+import '../App.css';
 
 function Communities() {
     const [searchTerm, setSearchTerm] = useState(""); // State for search input
@@ -12,14 +13,13 @@ function Communities() {
     const [contentsearchTerm, setContentSearchTerm] = useState(""); // State for header search input
 
     const communityData = [
-        { name: "Department ITE", todayPosts: 10, totalPosts: 100 },
-        { name: "Department of Data Science", todayPosts: 10, totalPosts: 100 },
-        { name: "Department History", todayPosts: 10, totalPosts: 100 },
-        { name: "Department Korea", todayPosts: 10, totalPosts: 100 },
+        { name: "Department ITE", faculty: "Faculty of Engineering", todayPosts: 10, totalPosts: 100 },
+        { name: "Department of Data Science", faculty: "Faculty of Science", todayPosts: 10, totalPosts: 100 },
+        { name: "Department History", faculty: "Faculty of Arts", todayPosts: 10, totalPosts: 100 },
+        { name: "Department Korea", faculty: "Faculty of Humanities", todayPosts: 10, totalPosts: 100 },
     ];
 
     const handleSignInClick = () => navigate('/loginregister');
-    const handleSignUpClick = () => navigate('/loginregister');
     const handleHomeClick = () => navigate('/');
     const handleCommunitiesClick = () => navigate('/communities');
     const handleProfileClick = () => navigate('/profile');
@@ -38,7 +38,7 @@ function Communities() {
     return (
         <div className="flex flex-col min-h-screen bg-white-900 text-white font-sans">
             {/* Header */}
-            <header className="bg-blue-700 p-4">
+            <header className="bg-blue-700 p-4 sticky-header">
                 <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center">
                     <div className="flex items-center space-x-4 mb-4 lg:mb-0">
                         <img src="logo.png" alt="Knowledgechain" className="w-10 h-10" />
@@ -89,12 +89,6 @@ function Communities() {
                         >
                             Sign In
                         </button>
-                        <button
-                            onClick={handleSignUpClick}
-                            className="bg-orange-500 px-4 py-2 rounded-md w-full lg:w-auto"
-                        >
-                            Sign Up
-                        </button>
                     </div>
                 </div>
             </header>
@@ -126,6 +120,7 @@ function Communities() {
                         >
                             <div className="flex flex-col items-center w-full text-center">
                                 <h2 className="text-lg font-semibold mb-6">{community.name}</h2>
+                                <h2 className="text-lg font-semibold mb-6">{community.faculty}</h2>
                                 <p className="text-sm text-gray-400">
                                     Today Post: {community.todayPosts} | Total Post: {community.totalPosts}
                                 </p>

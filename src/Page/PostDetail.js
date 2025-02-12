@@ -7,6 +7,7 @@ import { AiOutlineLike } from "react-icons/ai";
 import { GrAnnounce } from "react-icons/gr";
 import CommentPopup from './Comment'; // Import the Popup component
 import ReportPopup from './Report'; // Import the Popup component
+import '../App.css';
 
 function PostDetail() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -59,7 +60,7 @@ function PostDetail() {
   return (
     <div className="bg-white text-white font-sans min-h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-blue-700 p-4">
+      <header className="bg-blue-700 p-4 sticky-header">
         <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center">
           <div className="flex items-center space-x-4 mb-4 lg:mb-0">
             <img src="logo.png" alt="Knowledgechain" className="w-10 h-10" />

@@ -3,6 +3,7 @@ import { FaUserLarge, FaPeopleGroup, FaStar } from "react-icons/fa6";
 import { FaSearch, FaBell, FaCog } from "react-icons/fa";
 import { MdHomeFilled } from "react-icons/md";
 import { useNavigate } from 'react-router-dom';
+import '../App.css';
 
 function ViewProfile() {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ function ViewProfile() {
     return (
         <div className="bg-white-100 text-white font-sans min-h-screen flex flex-col">
             {/* Header */}
-            <header className="bg-blue-700 p-4">
+            <header className="bg-blue-700 p-4 sticky-header">
                 <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center">
                     <div className="flex items-center space-x-4 mb-4 lg:mb-0">
                         <img src="logo.png" alt="Knowledgechain" className="w-10 h-10" />

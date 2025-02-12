@@ -3,6 +3,7 @@ import { FaUserLarge, FaPeopleGroup } from "react-icons/fa6";
 import { FaSearch, FaBell, FaCog } from "react-icons/fa";
 import { MdHomeFilled } from "react-icons/md";
 import { useNavigate, useLocation } from 'react-router-dom';
+import '../App.css';
 
 function Setting() {
     const [searchTerm, setSearchTerm] = useState("");
@@ -16,10 +17,6 @@ function Setting() {
     }, [theme]);
 
     const handleSignInClick = () => {
-        navigate('/loginregister');
-    };
-
-    const handleSignUpClick = () => {
         navigate('/loginregister');
     };
 
@@ -65,7 +62,7 @@ function Setting() {
     return (
         <div className={`min-h-screen flex flex-col ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
             {/* Header */}
-            <header className={`p-4 ${theme === "dark" ? "bg-blue-700" : "bg-blue-700"}`}>
+            <header className={`sticky-header p-4 ${theme === "dark" ? "bg-blue-700" : "bg-blue-700"}`}>
                 <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center">
                     <div className="flex items-center space-x-4 mb-4 lg:mb-0 text-white">
                         <img src="logo.png" alt="Knowledgechain" className="w-10 h-10" />
@@ -112,12 +109,6 @@ function Setting() {
                             className="bg-orange-500 text-white px-4 py-2 rounded-md w-full lg:w-auto"
                         >
                             Sign In
-                        </button>
-                        <button
-                            onClick={handleSignUpClick}
-                            className="bg-orange-500 text-white px-4 py-2 rounded-md w-full lg:w-auto"
-                        >
-                            Sign Up
                         </button>
                     </div>
                 </div>

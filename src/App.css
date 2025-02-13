@@ -28,6 +28,23 @@
   color: #61dafb;
 }
 
+/* App.css */
+.menu {
+  background-color: #ffffff; /* Change to a contrasting color */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+.menu-item:hover {
+  background-color: #f0f0f0; /* Hover effect */
+}
+
+.search-bar {
+  margin: 0 10px; /* Adjust margin */
+  padding: 10px; /* Adjust padding */
+  border-radius: 5px; /* Rounded corners */
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
@@ -44,3 +61,4 @@
     z-index: 10;
   }
 }
+

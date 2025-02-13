@@ -103,18 +103,6 @@ const LoginRegister = () => {
                         <FaBell 
                         className="cursor-pointer w-9 h-9 p-2 rounded-md hover:bg-orange-500 active:bg-orange-500"
                         onClick={handleNotificationClick}/>
-                        <button
-                            onClick={() => setIsSignUp(false)}
-                            className="bg-orange-500 px-4 py-2 rounded-md w-full lg:w-auto"
-                        >
-                            Sign In
-                        </button>
-                        <button
-                            onClick={() => setIsSignUp(true)}
-                            className="bg-orange-500 px-4 py-2 rounded-md w-full lg:w-auto"
-                        >
-                            Sign Up
-                        </button>
                     </div>
                 </div>
             </header>

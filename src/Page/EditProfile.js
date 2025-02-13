@@ -170,18 +170,35 @@ function EditProfile() {
 
                         {/* City */}
                         <div className="relative">
-                        <label className="block text-gray-700 font-medium">City</label>
-                        <select
-                            className="w-full px-2 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 appearance-none"
-                        >
-                            <option>Baku</option>
-                            <option>Ganja</option>
-                            <option>Sumqayit</option>
-                        </select>
-                        <span className="absolute top-1/2 right-2 transform text-gray-500 pointer-events-none">
-                        <RiArrowDropDownLine size={24} />
-                        </span>
-                    </div>
+                            <label className="block text-gray-700 font-medium">City</label>
+                            <select
+                                className="w-full px-2 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 appearance-none"
+                            >
+                                <option>Choose Your City</option>
+                                <option>Baku</option>
+                                <option>Ganja</option>
+                                <option>Sumqayit</option>
+                            </select>
+                            <span className="absolute top-1/2 right-2 transform text-gray-500 pointer-events-none">
+                            <RiArrowDropDownLine size={24} />
+                            </span>
+                        </div>
+
+                        {/* Department */}
+                        <div className="relative">
+                            <label className="block text-gray-700 font-medium">My Department</label>
+                            <select
+                                className="w-full px-2 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 appearance-none"
+                            >
+                                <option>Choose Your Department</option>
+                                <option>ITE</option>
+                                <option>Data Science</option>
+                                <option>History</option>
+                            </select>
+                            <span className="absolute top-1/2 right-2 transform text-gray-500 pointer-events-none">
+                            <RiArrowDropDownLine size={24} />
+                            </span>
+                        </div>
 
                         {/* Buttons */}
                         <div className="flex justify-end space-x-4 mt-4">

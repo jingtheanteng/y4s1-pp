@@ -161,7 +161,14 @@ function Profile() {
                                 Baku
                             </p>
                         </div>
-
+                        
+                        {/* Department */}
+                        <div>
+                            <label className="block text-gray-700 font-medium">My Department</label>
+                            <p className="w-full p-2 border border-gray-300 rounded-md bg-gray-100">
+                                ITE
+                            </p>
+                        </div>
                     </div>
 
                 </main>

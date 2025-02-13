@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaSearch, FaHeart } from "react-icons/fa";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { CgAttachment } from "react-icons/cg";
@@ -7,10 +7,14 @@ import '../App.css';
 
 function Home() {
     const [searchTerm, setSearchTerm] = useState("");
-    const [likedCards, setLikedCards] = useState([false, false, false, false]); // Array to track heart icons for each card
+    const [likedCards, setLikedCards] = useState([]);
     const [menuOpen, setMenuOpen] = useState(false);
+    const [posts, setPosts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
     const location = useLocation();
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
     const handleSignInClick = () => {
         navigate('/loginregister');
@@ -37,6 +41,31 @@ function Home() {
     };
 
     const isHome = location.pathname === '/';
+
+    useEffect(() => {
+        fetchPosts();
+    }, []);
+
+    const fetchPosts = async () => {
+        try {
+            const response = await fetch(`${API_URL}/post`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch posts');
+            }
+            const data = await response.json();
+            if (data.status) {
+                setPosts(data.data);
+                setLikedCards(new Array(data.data.length).fill(false));
+            } else {
+                throw new Error(data.message);
+            }
+        } catch (err) {
+            setError(err.message);
+            console.error('Error fetching posts:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const toggleHeart = (index) => {
         const newLikedCards = [...likedCards];
@@ -219,63 +248,63 @@ function Home() {
 
                     {/* Post Cards */}
                     <div className="space-y-4">
-                        {[...Array(4)].map((_, index) => (
-                            <div
-                                key={index}
-                                className="bg-gray-800 p-4 rounded-xl shadow-md flex flex-col space-y-3"
-                                onClick={() => navigate('/post-detail')}
-                            >
-
-                                {/* Post Title */}
-                                <div className="flex justify-between items-center">
-                                    <div className="flex space-x-2">
-                                        <h3 className="text-lg font-semibold text-white mb-1">
-                                            OnePay - Online Payment Processing Web App - Download from uihut.com
-                                        </h3>
-                                    </div>
-                                    {/* Heart Icon */}
-                                {/* Heart Icon */}
-                                <button 
-                                    onClick={(e) => {
-                                        e.stopPropagation(); // Prevent click event from bubbling up to the parent card
-                                        toggleHeart(index);
-                                    }} 
-                                    className="text-gray-400 hover:text-orange-500"
+                        {loading ? (
+                            <div className="text-center text-gray-400">Loading posts...</div>
+                        ) : error ? (
+                            <div className="text-center text-red-500">{error}</div>
+                        ) : (
+                            posts.map((post, index) => (
+                                <div
+                                    key={post.id}
+                                    className="bg-gray-800 p-4 rounded-xl shadow-md flex flex-col space-y-3"
+                                    onClick={() => navigate(`/post-detail/${post.id}`)}
                                 >
-                                    <FaHeart className={`text-xl ${likedCards[index] ? 'text-orange-500' : 'text-gray-400'}`} />
-                                </button>
-                                </div>
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex space-x-2">
+                                            <h3 className="text-lg font-semibold text-white mb-1">
+                                                {post.name}
+                                            </h3>
+                                        </div>
+                                        <button 
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleHeart(index);
+                                            }} 
+                                            className="text-gray-400 hover:text-orange-500"
+                                        >
+                                            <FaHeart className={`text-xl ${likedCards[index] ? 'text-orange-500' : 'text-gray-400'}`} />
+                                        </button>
+                                    </div>
 
-                                {/* Tag Section */}
-                                <span className="text-gray-300 text-xs bg-gray-700 px-2 py-1 rounded-md w-fit">
-                                    #Department ITE
-                                </span>
+                                    <span className="text-gray-300 text-xs bg-gray-700 px-2 py-1 rounded-md w-fit">
+                                        #{post.department_name}
+                                    </span>
 
-                                {/* User Info & Stats */}
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center space-x-3">
-                                        <img
-                                            src="/images/profile.jpg"
-                                            alt="User Avatar"
-                                            className="w-10 h-10 rounded-full"
-                                        />
-                                        <div>
-                                            <p className="text-white text-sm font-semibold">
-                                                Teng Jingthean
-                                            </p>
-                                            <p className="text-gray-400 text-xs">1 week ago</p>
+                                    <div className="flex justify-between items-center">
+                                        <div className="flex items-center space-x-3">
+                                            <img
+                                                src="/images/profile.jpg"
+                                                alt="User Avatar"
+                                                className="w-10 h-10 rounded-full"
+                                            />
+                                            <div>
+                                                <p className="text-white text-sm font-semibold">
+                                                    {post.owner_name}
+                                                </p>
+                                                <p className="text-gray-400 text-xs">
+                                                    {new Date(post.created_at).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center space-x-6 text-gray-400 text-sm">
+                                            <span>{post.like_count} Likes</span>
+                                            <span>{post.comment_count} Comments</span>
                                         </div>
                                     </div>
-
-                                    {/* Stats */}
-                                    <div className="flex items-center space-x-6 text-gray-400 text-sm">
-                                        <span>601,066 Views</span>
-                                        <span>24,753 Likes</span>
-                                        <span>209 Comments</span>
-                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
 
                     {/* Pagination */}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaHeart, FaSearch} from "react-icons/fa"; // Added icons
 import { useNavigate, useLocation } from 'react-router-dom';
 import '../App.css';
@@ -7,17 +7,34 @@ function Communities() {
     const [searchTerm, setSearchTerm] = useState(""); // State for search input
     const [menuOpen, setMenuOpen] = useState(false);
     const [likedCommunities, setLikedCommunities] = useState({}); // Track liked communities
+    const [departments, setDepartments] = useState([]); // New state for departments
+    const [loading, setLoading] = useState(true); // Add loading state
+    const [error, setError] = useState(null); // Add error state
     const navigate = useNavigate();  // Initialize navigate
     const location = useLocation(); // Detect current location
     const [contentsearchTerm, setContentSearchTerm] = useState(""); // State for header search input
     
 
-    const communityData = [
-        { name: "Department ITE", faculty: "Faculty of Engineering", todayPosts: 10, totalPosts: 100 },
-        { name: "Department of Data Science", faculty: "Faculty of Science", todayPosts: 10, totalPosts: 100 },
-        { name: "Department History", faculty: "Faculty of Arts", todayPosts: 10, totalPosts: 100 },
-        { name: "Department Korea", faculty: "Faculty of Humanities", todayPosts: 10, totalPosts: 100 },
-    ];
+    useEffect(() => {
+        fetchDepartments();
+    }, []);
+
+    const fetchDepartments = async () => {
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/department`);
+            const result = await response.json();
+            
+            if (result.status) {
+                setDepartments(result.data);
+            } else {
+                setError(result.message);
+            }
+        } catch (err) {
+            setError('Failed to fetch departments');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSignInClick = () => navigate('/loginregister');
     const handleHomeClick = () => navigate('/');
@@ -112,28 +129,34 @@ function Communities() {
 
                 {/* Community Cards */}
                 <div className="flex justify-center flex-wrap space-y-4 w-full lg:w-1/2 mx-auto">
-                    {communityData.map((community, index) => (
-                        <div
-                            key={index}
-                            className="flex justify-between items-center bg-gray-800 rounded-2xl p-8 shadow-lg hover:bg-gray-700 w-full"
-                            onClick={() => navigate('/department-community')}
-                        >
-                            <div className="flex flex-col items-center w-full text-center">
-                                <h2 className="text-lg font-semibold mb-6">{community.name}</h2>
-                                <h2 className="text-lg font-semibold mb-6">{community.faculty}</h2>
-                                <p className="text-sm text-gray-400">
-                                    Today Post: {community.todayPosts} | Total Post: {community.totalPosts}
-                                </p>
+                    {loading ? (
+                        <p className="text-black">Loading departments...</p>
+                    ) : error ? (
+                        <p className="text-red-500">{error}</p>
+                    ) : (
+                        departments.map((department, index) => (
+                            <div
+                                key={department.id}
+                                className="flex justify-between items-center bg-gray-800 rounded-2xl p-8 shadow-lg hover:bg-gray-700 w-full"
+                                onClick={() => navigate('/department-community')}
+                            >
+                                <div className="flex flex-col items-center w-full text-center">
+                                    <h2 className="text-lg font-semibold mb-6">{department.name}</h2>
+                                    <h2 className="text-lg font-semibold mb-6">{department.faculty_name}</h2>
+                                    <p className="text-sm text-gray-400">
+                                        Created at: {new Date(department.created_at).toLocaleDateString()}
+                                    </p>
+                                </div>
+                                <FaHeart
+                                    className={`cursor-pointer w-6 h-6 ${likedCommunities[department.id] ? 'text-orange-500' : 'text-gray-400'}`}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleLike(department.id);
+                                    }}
+                                />
                             </div>
-                            <FaHeart
-                            className={`cursor-pointer w-6 h-6 ${likedCommunities[index] ? 'text-orange-500' : 'text-gray-400'}`}
-                            onClick={(e) => {
-                                e.stopPropagation(); // Prevent navigation when clicking the heart icon
-                                toggleLike(index);
-                            }}
-                            />
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </div>

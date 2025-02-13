@@ -119,6 +119,12 @@ function ViewProfile() {
                         <div className="w-full sm:w-1/2 p-2 border border-gray-300 rounded-md">
                             <p className="text-gray-700 break-words">Phnom Penh</p>
                         </div>
+
+                        {/* Department */}
+                        <label className="block text-gray-700 font-medium">Department</label>
+                        <div className="w-full sm:w-1/2 p-2 border border-gray-300 rounded-md">
+                            <p className="text-gray-700 break-words">ITE</p>
+                        </div>
                     </div>
                 </main>
             </div>

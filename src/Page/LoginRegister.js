@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { RiLockPasswordLine } from "react-icons/ri";
-import { FaEye, FaEyeSlash, FaSearch, FaBell, FaCog } from "react-icons/fa"; // Added icons
-import { FaUserLarge, FaPeopleGroup } from "react-icons/fa6";
-import { MdEmail, MdHomeFilled } from "react-icons/md";
+import { FaEye, FaEyeSlash, FaSearch} from "react-icons/fa"; // Added icons
+import { FaUserLarge} from "react-icons/fa6";
+import { MdEmail} from "react-icons/md";
 import '../App.css';
 
 const LoginRegister = () => {
+    const [menuOpen, setMenuOpen] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState(false); // State for toggling password visibility
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false); // State for toggling confirm password visibility
@@ -41,6 +42,10 @@ const LoginRegister = () => {
         navigate('/'); // Navigate to the /Home route
     };
 
+    const handleSignInClick = () => {
+        navigate('/loginregister');
+    };
+
     const handleCommunitiesClick = () => {
         navigate('/communities');  // Navigate to /Home when the home icon is clicked
     };
@@ -64,45 +69,53 @@ const LoginRegister = () => {
                 <div className="container mx-auto flex flex-col lg:flex-row justify-between items-center">
                     <div className="flex items-center space-x-4 mb-4 lg:mb-0">
                         <img src="logo.png" alt="Knowledgechain" className="w-10 h-10" />
-                        <span className="text-2xl font-bold text-white">Knowledgechain</span>
                     </div>
 
                     {/* Search input between icons */}
                     <div className="flex flex-col lg:flex-row items-center space-x-0 lg:space-x-12 w-full lg:w-auto">
-                        <div className="flex items-center justify-between w-full lg:w-auto mb-4 lg:mb-0 space-x-8">
-                            <MdHomeFilled 
-                                onClick={handleHomeClick} // Add onClick handler for navigation
-                                className="cursor-pointer w-10 h-10 p-2 rounded-md hover:bg-orange-500 active:bg-orange-500" 
-                            />
-                            <FaPeopleGroup 
-                            className="cursor-pointer w-10 h-10 p-2 rounded-md hover:bg-orange-500 active:bg-orange-500"
-                            onClick={handleCommunitiesClick}
-                            />
-                            <FaUserLarge 
-                            className="cursor-pointer w-9 h-9 p-2 rounded-md hover:bg-orange-500 active:bg-orange-500"
-                            onClick={handleProfileClick}
-                            />
-                            <FaCog 
-                            className="cursor-pointer w-9 h-9 p-2 text-white rounded-md hover:bg-orange-500 active:bg-orange-500"
-                            onClick={handleSettingClick}/>
-                        </div>
-                        
-                        <div className="relative w-full lg:w-[400px]">
-                            <input
-                                type="text"
-                                className="px-4 py-1 rounded-md text-black focus:outline-none w-full"
-                                placeholder="Type Here to Search..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                            <FaSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+                        <div className="relative w-full lg:w-auto mb-4 lg:mb-0 flex justify-center">
+                            {/* Dropdown for smaller screens */}
+                            <div className="lg:hidden">
+                                <button className="text-lg font-bold bg-blue-700 text-white px-4 py-2 rounded-md" onClick={() => setMenuOpen(!menuOpen)}>
+                                    Menu
+                                </button>
+                                {menuOpen && (
+                                    <div className="absolute left-1/2 transform -translate-x-1/2 bg-white text-black rounded-md shadow-lg mt-2 w-full">
+                                        <span className="block cursor-pointer p-2 hover:bg-orange-500" onClick={handleHomeClick}>Home</span>
+                                        <span className="block cursor-pointer p-2 hover:bg-orange-500" onClick={handleCommunitiesClick}>Communities</span>
+                                        <span className="block cursor-pointer p-2 hover:bg-orange-500" onClick={handleProfileClick}>Profile</span>
+                                        <span className="block cursor-pointer p-2 hover:bg-orange-500" onClick={handleSettingClick}>Settings</span>
+                                        <span className="block cursor-pointer p-2 hover:bg-orange-500" onClick={handleNotificationClick}>Notifications</span>
+                                        <span className={`block cursor-pointer p-2 ${isSignUp ? 'text-orange-500' : 'hover:text-orange-500'}`} onClick={handleSignInClick}>Sign In</span>
+                                    </div>
+                                )}
+                            </div>
+                            {/* Regular buttons for larger screens */}
+                            <div className="hidden lg:flex items-center justify-between w-full lg:w-auto mb-4 lg:mb-0 space-x-8">
+                                <span className="cursor-pointer text-lg text-white font-bold hover:text-orange-500" onClick={handleHomeClick}>Home</span>
+                                <span className="cursor-pointer text-lg text-white font-bold hover:text-orange-500" onClick={handleCommunitiesClick}>Communities</span>
+                                <span className="cursor-pointer text-lg text-white font-bold hover:text-orange-500" onClick={handleProfileClick}>Profile</span>
+                                <span className="cursor-pointer text-lg text-white font-bold hover:text-orange-500" onClick={handleSettingClick}>Settings</span>
+                                <span className="cursor-pointer text-lg text-white font-bold hover:text-orange-500" onClick={handleNotificationClick}>Notifications</span>
+                                <span className={`cursor-pointer text-lg font-bold ${isSignUp || !isSignUp ? 'text-orange-500' : 'hover:text-orange-500'}`} onClick={handleSignInClick}>Sign In</span>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col lg:flex-row items-center space-y-4 lg:space-y-0 lg:space-x-8">
-                        <FaBell 
-                        className="cursor-pointer w-9 h-9 p-2 rounded-md hover:bg-orange-500 active:bg-orange-500"
-                        onClick={handleNotificationClick}/>
+                    {/* Search Bar moved next to navigation items */}
+                    <div className={`flex justify-center mt-4 lg:mt-0 lg:ml-4 ${menuOpen ? 'hidden' : ''}`}>
+                        <div className="text-black relative w-full max-w-md">
+                            <input
+                                type="text"
+                                placeholder="Type here to search"
+                                className="w-full p-2 pr-10 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <button className="absolute right-0 top-1/2 transform -translate-y-1/2 mr-2">
+                                <FaSearch className="text-gray-500" />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </header>

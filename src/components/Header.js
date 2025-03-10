@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaSearch, FaBell } from "react-icons/fa";
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FaSignOutAlt } from 'react-icons/fa';
@@ -9,6 +9,27 @@ function Header() {
     const navigate = useNavigate();
     const location = useLocation();
     const [isDropdownVisible, setDropdownVisible] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userData, setUserData] = useState(null);
+
+    // Check login status from localStorage
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+        
+        if (token && user) {
+            try {
+                const parsedUser = JSON.parse(user);
+                setUserData(parsedUser);
+                setIsLoggedIn(true);
+            } catch (error) {
+                console.error("Error parsing user data:", error);
+                // Clear invalid data
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+            }
+        }
+    }, [location]); // Re-check when location changes
 
     const handleSignInClick = () => navigate('/loginregister');
     const handleHomeClick = () => navigate('/');
@@ -30,7 +51,18 @@ function Header() {
     };
 
     const handleLogout = () => {
-        // Perform logout actions
+        // Clear localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        // Update state
+        setIsLoggedIn(false);
+        setUserData(null);
+        setDropdownVisible(false);
+        
+        // Navigate to home page
+        navigate('/');
+        
         alert("Logged out successfully!");
     };
 
@@ -56,7 +88,9 @@ function Header() {
                                         <span className={`block cursor-pointer p-2 ${isCommunities ? 'text-orange-500' : 'hover:text-orange-500'}`} onClick={handleCommunitiesClick}>Communities</span>
                                         <span className={`block cursor-pointer p-2 ${isProfile ? 'text-orange-500' : 'hover:text-orange-500'}`} onClick={handleProfileClick}>Profile</span>
                                         <span className={`block cursor-pointer p-2 ${isSetting ? 'text-orange-500' : 'hover:text-orange-500'}`} onClick={handleSettingClick}>Settings</span>
-                                        <span className={`block cursor-pointer p-2 ${isSignIn ? 'text-orange-500' : 'hover:text-orange-500'}`}onClick={handleSignInClick}>Sign In</span>
+                                        {!isLoggedIn && (
+                                            <span className={`block cursor-pointer p-2 ${isSignIn ? 'text-orange-500' : 'hover:text-orange-500'}`} onClick={handleSignInClick}>Sign In</span>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -66,7 +100,9 @@ function Header() {
                                 <span className={`cursor-pointer text-lg font-bold ${isCommunities ? 'text-orange-500' : 'text-white hover:text-orange-500'}`} onClick={handleCommunitiesClick}>Communities</span>
                                 <span className={`cursor-pointer text-lg font-bold ${isProfile ? 'text-orange-500' : 'text-white hover:text-orange-500'}`} onClick={handleProfileClick}>Profile</span>
                                 <span className={`cursor-pointer text-lg font-bold ${isSetting ? 'text-orange-500' : 'text-white hover:text-orange-500'}`} onClick={handleSettingClick}>Settings</span>
-                                <span className={`cursor-pointer text-lg font-bold ${isSignIn ? 'text-orange-500' : 'text-white hover:text-orange-500'}`} onClick={handleSignInClick}>Sign In</span>
+                                {!isLoggedIn && (
+                                    <span className={`cursor-pointer text-lg font-bold ${isSignIn ? 'text-orange-500' : 'text-white hover:text-orange-500'}`} onClick={handleSignInClick}>Sign In</span>
+                                )}
                             </nav>
                         </div>
                     </div>
@@ -93,8 +129,8 @@ function Header() {
                             </div>
                         </div>
 
-                        {/* Profile Dropdown - Only show on /home-loggedin */}
-                        {location.pathname === '/home-loggedin' && (
+                        {/* Profile Dropdown - Show when logged in */}
+                        {isLoggedIn && userData && (
                             <div className={`relative ${menuOpen ? 'hidden' : ''}`}>
                                 <div
                                     className="bg-blue-500 flex items-center text-white px-7 py-1 rounded-lg shadow-md cursor-pointer"
@@ -111,8 +147,8 @@ function Header() {
                                         <div className="flex items-center px-4 py-4">
                                             <img src="/images/profile.jpg" alt="User Avatar" className="w-12 h-12 rounded-full mr-4" />
                                             <div>
-                                                <p className="font-medium text-lg">Teng Jingthean</p>
-                                                <p className="text-sm text-gray-500">tengjingthean@gmail.com</p>
+                                                <p className="font-medium text-lg">{userData.name || 'User'}</p>
+                                                <p className="text-sm text-gray-500">{userData.email}</p>
                                             </div>
                                         </div>
                                         <hr className="border-gray-300" />

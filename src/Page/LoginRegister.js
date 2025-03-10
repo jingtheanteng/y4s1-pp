@@ -8,23 +8,108 @@ import '../App.css';
 import Header from '../components/Header';
 
 const LoginRegister = () => {
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
     const [isSignUp, setIsSignUp] = useState(false);
     const [passwordVisible, setPasswordVisible] = useState(false); // State for toggling password visibility
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false); // State for toggling confirm password visibility
+    const [loginInfo, setLoginInfo] = useState({
+        email: '',
+        password: ''
+    });
+    const [registerInfo, setRegisterInfo] = useState({
+        username: '',
+        email: '',
+        password: '',
+        confirmPassword: ''
+    });
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [userData, setUserData] = useState(null);
     const navigate = useNavigate(); // Initialize useNavigate
 
-    const handleSubmit = (e) => {
+    const handleLoginChange = (e) => {
+        const { name, value } = e.target;
+        setLoginInfo(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const handleRegisterChange = (e) => {
+        const { name, value } = e.target;
+        setRegisterInfo(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // Simulating successful login
-        const isAuthenticated = true; // Replace with actual authentication logic
-        
-        if (isAuthenticated) {
-            console.log("Logging in...");
-            navigate('/home-loggedin'); // Navigate to /home-loggedin
-        } else {
-            console.log("Login failed.");
-            alert("Invalid credentials. Please try again.");
+        try {
+            if (isSignUp) {
+                // Validate registration data
+                if (registerInfo.password !== registerInfo.confirmPassword) {
+                    alert("Passwords don't match");
+                    return;
+                }
+                
+                // Make API call to register the user
+                const response = await fetch(`${API_URL}/user/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: registerInfo.email,
+                        password: registerInfo.password,
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                if (data.status) {
+                    console.log("Registration successful:", data);
+                    alert("Registration successful! Please log in.");
+                    setIsSignUp(false); // Switch to login form
+                } else {
+                    console.log("Registration failed:", data.message);
+                    alert(data.message || "Registration failed. Please try again.");
+                }
+            } else {
+                // Login logic
+                console.log(loginInfo);
+                const response = await fetch(`${API_URL}/user/authenticate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: loginInfo.email,
+                        password: loginInfo.password
+                    }),
+                });
+                
+                const data = await response.json();
+                
+                if (data.status) {
+                    console.log("Login successful:", data);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('token', data.session.token);
+                    
+                    // Show success message
+                    alert("Login successful! Welcome back.");
+                    
+                    // Redirect to home page
+                    navigate('/');
+                } else {
+                    console.log("Login failed:", data.message);
+                    alert(data.message || "Invalid credentials. Please try again.");
+                }
+            }
+        } catch (error) {
+            console.error("Error during authentication:", error);
+            alert("An error occurred. Please try again later.");
         }
     };
     
@@ -75,6 +160,8 @@ const LoginRegister = () => {
                                                     id="username"
                                                     type="text"
                                                     name="username"
+                                                    value={registerInfo.username}
+                                                    onChange={handleRegisterChange}
                                                     className="block w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-black"
                                                     placeholder="Username"
                                                     required
@@ -90,6 +177,8 @@ const LoginRegister = () => {
                                                 id="email"
                                                 type="email"
                                                 name="email"
+                                                value={isSignUp ? registerInfo.email : loginInfo.email}
+                                                onChange={isSignUp ? handleRegisterChange : handleLoginChange}
                                                 className="block w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-black"
                                                 placeholder="Email"
                                                 required
@@ -104,6 +193,8 @@ const LoginRegister = () => {
                                                 id="password"
                                                 type={passwordVisible ? "text" : "password"}
                                                 name="password"
+                                                value={isSignUp ? registerInfo.password : loginInfo.password}
+                                                onChange={isSignUp ? handleRegisterChange : handleLoginChange}
                                                 className="block w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-black"
                                                 placeholder="Password"
                                                 required
@@ -141,8 +232,10 @@ const LoginRegister = () => {
                                                 <RiLockPasswordLine className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
                                                 <input
                                                     id="confirmPassword"
-                                                    type={confirmPasswordVisible ? "text" : "password"} // Toggle based on confirmPasswordVisible state
+                                                    type={confirmPasswordVisible ? "text" : "password"}
                                                     name="confirmPassword"
+                                                    value={registerInfo.confirmPassword}
+                                                    onChange={handleRegisterChange}
                                                     className="block w-full px-10 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-black"
                                                     placeholder="Confirm Password"
                                                     required

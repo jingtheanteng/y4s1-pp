@@ -31,7 +31,7 @@ function App() {
                 <Route path="/forget-password" element={<ForgetPassword />} />
                 <Route path="/edit-profile" element={<EditProfile />} />
                 <Route path="/department-community" element={<DepartmentCommunity />} />
-                <Route path="/post-detail" element={<PostDetail />} />
+                <Route path="/post-detail/:id" element={<PostDetail />} />
                 <Route path="/view-profile" element={<ViewProfile />} />
                 <Route path="/home-loggedin" element={<LoggedIn />} />
             </Routes>

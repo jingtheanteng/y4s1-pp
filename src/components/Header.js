@@ -67,7 +67,7 @@ function Header() {
     };
 
     return (
-            <header className="bg-blue-700 p-4 sticky-header">
+            <header className="bg-gray-800 p-4 sticky-header">
                 <div className="container mx-auto flex flex-col lg:flex-row items-center">
                     {/* Logo */}
                     <div className="flex items-center lg:w-1/6 lg:mb-0">
@@ -133,7 +133,7 @@ function Header() {
                         {isLoggedIn && userData && (
                             <div className={`relative ${menuOpen ? 'hidden' : ''}`}>
                                 <div
-                                    className="bg-blue-500 flex items-center text-white px-7 py-1 rounded-lg shadow-md cursor-pointer"
+                                    className="flex items-center text-white px-7 py-1 rounded-lg shadow-md cursor-pointer"
                                     onClick={toggleDropdown}
                                 >
                                     <div className="w-9 h-9 border-2 rounded-full flex items-center justify-center">

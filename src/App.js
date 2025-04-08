@@ -14,6 +14,7 @@ import DepartmentCommunity from './Page/DepartmentCommunity';
 import PostDetail from './Page/PostDetail';
 import ViewProfile from './Page/ViewProfile';
 import LoggedIn from './Page/LoggedIn';
+import UserList from './Admin/User/UserList';
 
 function App() {
     return (
@@ -21,6 +22,7 @@ function App() {
             <Routes>
                 {/* Routes for Admin and User */}
                 <Route path="/admin" element={<AdminHome />} />
+                <Route path="/admin/users" element={<UserList />} />
                 <Route path="/user" element={<UserHome />} />
                 <Route path="/" element={<Home />} />
                 <Route path="/loginregister" element={<LoginRegister />} />

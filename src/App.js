@@ -15,6 +15,11 @@ import PostDetail from './Page/PostDetail';
 import ViewProfile from './Page/ViewProfile';
 import LoggedIn from './Page/LoggedIn';
 import UserList from './Admin/User/UserList';
+import CategoryList from './Admin/Category/CategoryList';
+import DepartmentList from './Admin/Department/DepartmentList';
+import FacultyList from './Admin/Faculty/FacultyList';
+import PostList from './Admin/Post/PostList';
+import CommentList from './Admin/Comment/CommentList';
 
 function App() {
     return (
@@ -23,6 +28,11 @@ function App() {
                 {/* Routes for Admin and User */}
                 <Route path="/admin" element={<AdminHome />} />
                 <Route path="/admin/users" element={<UserList />} />
+                <Route path="/admin/category" element={<CategoryList />} />
+                <Route path="/admin/department" element={<DepartmentList />} />
+                <Route path="/admin/faculty" element={<FacultyList />} />
+                <Route path="/admin/posts" element={<PostList />} />
+                <Route path="/admin/comments" element={<CommentList />} />
                 <Route path="/user" element={<UserHome />} />
                 <Route path="/" element={<Home />} />
                 <Route path="/loginregister" element={<LoginRegister />} />

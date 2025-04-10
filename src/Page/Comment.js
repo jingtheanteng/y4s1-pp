@@ -21,7 +21,7 @@ function Comment({ closePopup }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
       <div className="bg-white w-[1150px] p-6 sm:p-8 md:w-[80%] lg:w-[60%] xl:w-[60%] rounded-lg shadow-2xl">
         {/* Header */}
         <h2 className="text-black text-center p-6 rounded-t-lg text-3xl font-bold">Discussion</h2>
@@ -30,7 +30,7 @@ function Comment({ closePopup }) {
         <div className="p-6">
           <p className="text-md text-gray-700 mb-3">Reply to: Oggy</p>
           <textarea
-            className="w-full h-40 border rounded-md p-3 text-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full h-40 border rounded-md p-3 text-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800"
             placeholder="Type something..."
             value={commentText}
             onChange={handleChange}
@@ -41,7 +41,7 @@ function Comment({ closePopup }) {
             <label className="text-md text-gray-500 block mb-2">Attachment</label>
             <input
               type="file"
-              className="w-full border rounded-md p-3 text-sm focus:outline-none"
+              className="w-full border rounded-md p-3 text-sm focus:outline-none text-gray-800"
             />
           </div>
 

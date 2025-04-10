@@ -71,7 +71,7 @@ function Header() {
                 <div className="container mx-auto flex flex-col lg:flex-row items-center">
                     {/* Logo */}
                     <div className="flex items-center lg:w-1/6 lg:mb-0">
-                        <img src="./images/Logo.png" alt="Knowledgechain" className="w-12 h-12" />
+                        <img src="/images/Logo.png" alt="Knowledgechain" className="w-12 h-12" />
                     </div>
 
                     {/* Navigation - Center Section */}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import AdminSidebar from '../components/AdminSidebar';
-import { FaSearch, FaEye, FaTrash, FaFilter, FaThumbsUp, FaUser, FaClipboard } from 'react-icons/fa';
+import { FaSearch, FaEye, FaTrash, FaFilter, FaThumbsUp, FaUser, FaClipboard, FaReply } from 'react-icons/fa';
 
 function CommentList() {
   const [comments, setComments] = useState([]);
@@ -143,14 +143,53 @@ function CommentList() {
   // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+    return new Date(new Date(dateString).getTime() + 7 * 60 * 60 * 1000).toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Asia/Phnom_Penh'
+    });
   };
 
   // Get post title by post_id
   const getPostTitle = (postId) => {
     const post = posts.find(p => p.id === postId);
     return post ? post.name : 'Unknown Post';
+  };
+
+  // Handle view post button click
+  const handleViewPost = (postId) => {
+    // Navigate to the post detail page with the correct route
+    window.location.href = `/post-detail/${postId}`;
+  };
+
+  // Handle delete comment button click
+  const handleDeleteComment = async (commentId) => {
+    if (window.confirm('Are you sure you want to delete this comment?')) {
+      try {
+        const response = await fetch(`${API_URL}/comment/${commentId}`, {
+          method: 'DELETE',
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.status === true) {
+          // Refresh the comments list
+          fetchComments();
+        } else {
+          throw new Error(result.message || 'Failed to delete comment');
+        }
+      } catch (error) {
+        console.error("Error deleting comment:", error);
+        alert('Failed to delete comment: ' + error.message);
+      }
+    }
   };
 
   return (
@@ -239,6 +278,7 @@ function CommentList() {
                         <th className="py-3 px-4 text-left">Author</th>
                         <th className="py-3 px-4 text-left">Post</th>
                         <th className="py-3 px-4 text-left">Likes</th>
+                        <th className="py-3 px-4 text-left">Replies</th>
                         <th className="py-3 px-4 text-left">Created At</th>
                         <th className="py-3 px-4 text-left">Actions</th>
                       </tr>
@@ -265,18 +305,25 @@ function CommentList() {
                               <FaThumbsUp className="text-blue-500 mr-1" /> {comment.like_count}
                             </div>
                           </td>
+                          <td className="py-3 px-4">
+                            <div className="flex items-center text-sm">
+                              <FaReply className="text-green-500 mr-1" /> {comment.replies ? comment.replies.length : 0}
+                            </div>
+                          </td>
                           <td className="py-3 px-4 whitespace-nowrap">{formatDate(comment.created_at)}</td>
                           <td className="py-3 px-4">
                             <div className="flex space-x-2">
                               <button
                                 className="text-blue-500 hover:text-blue-700"
                                 title="View Related Post"
+                                onClick={() => handleViewPost(comment.post_id)}
                               >
                                 <FaEye />
                               </button>
                               <button
                                 className="text-red-500 hover:text-red-700"
                                 title="Delete"
+                                onClick={() => handleDeleteComment(comment.id)}
                               >
                                 <FaTrash />
                               </button>

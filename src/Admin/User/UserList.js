@@ -54,13 +54,24 @@ function UserList() {
 
   const handleUserDelete = async (userId) => {
     try {
-      // Note: The main.py doesn't have a delete user endpoint, so this is a placeholder
-      // In a real application, you would make an API call to delete the user
+      const response = await fetch(`${API_URL}/user/${userId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const result = await response.json();
       
-      // For now, let's just simulate a successful deletion by removing from local state
-      setUsers(users.filter(user => user.id !== userId));
-      setConfirmDelete(null);
-      alert('User deleted successfully');
+      if (result.status === true) {
+        // Update local state only after successful deletion
+        setUsers(users.filter(user => user.id !== userId));
+        setConfirmDelete(null);
+        alert('User deleted successfully');
+      } else {
+        throw new Error(result.message || 'Failed to delete user');
+      }
     } catch (error) {
       console.error("Error deleting user:", error);
       alert('An error occurred while deleting the user. Please try again.');

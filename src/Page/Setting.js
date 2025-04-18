@@ -1,86 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import Header from '../components/Header';
+import { useTheme } from './ThemeContext';
 
 function Setting() {
-    const [theme, setTheme] = useState("light");
+    const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        // Set the theme when the component is mounted
-        document.body.setAttribute('data-theme', theme);
-    }, [theme]);
-
-    const handleThemeChange = (newTheme) => {
-        setTheme(newTheme); // Update theme state
-    };
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+        setIsLoggedIn(!!(token && user));
+    }, []);
 
     const handleEditProfileClick = () => {
-        navigate('/edit-profile'); // Navigate to edit-profile page
+        navigate('/edit-profile');
     };
 
     const handleLogOutClick = () => {
-        // Perform logout logic here (clear session, token, etc.)
-        // Example:
-        // localStorage.removeItem('user');
-        // sessionStorage.clear();
-        
-        navigate('/'); // Redirect to the home page after logging out
+        // Clear localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setIsLoggedIn(false);
+        navigate('/');
+    };
+
+    const handleSignInClick = () => {
+        navigate('/loginregister');
     };
 
     return (
-        <div className={`min-h-screen flex flex-col ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
-            {/* Header */}
+        <div className={`min-h-screen flex flex-col ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
             <Header />
 
-            {/* Main Layout */}
-            <div className="text-black flex flex-1 container mx-auto p-6">
-                {/* Main Content */}
+            <div className={`flex flex-1 container mx-auto p-6 ${theme === "dark" ? "text-white" : "text-black"}`}>
                 <main className="flex-1">
-                <h1 className={`text-${theme === 'dark' ? 'white' : 'black'} text-3xl font-semibold mb-6`}>
-                    Setting
-                </h1>
+                    <h1 className={`text-3xl font-semibold mb-6 ${theme === "dark" ? "text-white" : "text-black"}`}>
+                        Setting
+                    </h1>
 
-                    {/* Settings Section */}
                     <div className="space-y-6">
-                        <div className="bg-white p-4 rounded-lg shadow-md">
-                            <h2 className="text-xl font-semibold mb-4">Theme</h2>
+                        <div className={`p-4 rounded-lg shadow-md ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+                            <h2 className={`text-xl font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-black"}`}>Theme</h2>
                             <div className="flex space-x-4">
                                 <button
-                                    onClick={() => handleThemeChange("light")}
-                                    className={`px-4 py-2 rounded-md ${theme === "light" ? 'bg-orange-500 text-white' : 'bg-gray-200'}`}
+                                    onClick={() => toggleTheme("light")}
+                                    className={`px-4 py-2 rounded-md ${theme === "light" ? 'bg-orange-500 text-white' : theme === "dark" ? 'bg-gray-700 text-white' : 'bg-gray-200'}`}
                                 >
                                     Light
                                 </button>
                                 <button
-                                    onClick={() => handleThemeChange("dark")}
-                                    className={`px-4 py-2 rounded-md ${theme === "dark" ? 'bg-orange-500 text-white' : 'bg-gray-200'}`}
+                                    onClick={() => toggleTheme("dark")}
+                                    className={`px-4 py-2 rounded-md ${theme === "dark" ? 'bg-orange-500 text-white' : theme === "dark" ? 'bg-gray-700 text-white' : 'bg-gray-200'}`}
                                 >
                                     Dark
                                 </button>
                             </div>
                         </div>
 
-                        <div className="bg-white p-4 rounded-lg shadow-md">
-                            <h2 className="text-xl font-semibold mb-4">Account</h2>
-                            <button
-                                onClick={handleEditProfileClick}
-                                className="bg-orange-500 text-white px-4 py-2 rounded-md"
-                            >
-                                Edit Account
-                            </button>
-                        </div>
+                        {isLoggedIn ? (
+                            <>
+                                <div className={`p-4 rounded-lg shadow-md ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+                                    <h2 className={`text-xl font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-black"}`}>Account</h2>
+                                    <button
+                                        onClick={handleEditProfileClick}
+                                        className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors"
+                                    >
+                                        Edit Account
+                                    </button>
+                                </div>
 
-                        <div className="bg-white p-4 rounded-lg shadow-md">
-                            <h2 className="text-xl font-semibold mb-4">Log Out</h2>
-                            <button
-                                onClick={handleLogOutClick} // Use the new logout handler
-                                className="bg-red-500 text-white px-4 py-2 rounded-md"
-                            >
-                                Log Out
-                            </button>
-                        </div>
+                                <div className={`p-4 rounded-lg shadow-md ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+                                    <h2 className={`text-xl font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-black"}`}>Log Out</h2>
+                                    <button
+                                        onClick={handleLogOutClick}
+                                        className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
+                                    >
+                                        Log Out
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <div className={`p-4 rounded-lg shadow-md ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+                                <h2 className={`text-xl font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-black"}`}>Sign In</h2>
+                                <button
+                                    onClick={handleSignInClick}
+                                    className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors"
+                                >
+                                    Sign In
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </main>
             </div>

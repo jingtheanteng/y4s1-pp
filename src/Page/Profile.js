@@ -1,114 +1,180 @@
 import { useEffect, useState } from 'react';
-import { FaStar } from "react-icons/fa6"; // Added FaStar
+import { FaStar } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import Header from '../components/Header';
+import { useTheme } from './ThemeContext';
 
 function Profile() {
     const navigate = useNavigate();
     const [profileData, setProfileData] = useState(null);
+    const { theme } = useTheme();
 
     useEffect(() => {
-        // Simulate an API call
-        fetch('/api/profile') // Replace with your actual API endpoint
-            .then((response) => response.json())
-            .then((data) => setProfileData(data));
-    }, []);
+        const fetchProfileData = async () => {
+            try {
+                // Get session token from localStorage
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    navigate('/loginregister');
+                    return;
+                }
 
-    //if (!profileData) return <p>Loading...</p>;
+                // First validate the session
+                const validateResponse = await fetch('http://localhost:5001/session/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ token })
+                });
+
+                const validateData = await validateResponse.json();
+                
+                if (!validateData.status || !validateData.data.valid) {
+                    localStorage.removeItem('token');
+                    navigate('/loginregister');
+                    return;
+                }
+
+                // Get all users and find the current user
+                const userResponse = await fetch('http://localhost:5001/user');
+                const userData = await userResponse.json();
+
+                if (userData.status === 'success' && userData.data) {
+                    const currentUser = userData.data.find(user => user.id === validateData.data.user_id);
+                    if (currentUser) {
+                        setProfileData(currentUser);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching profile data:', error);
+                navigate('/loginregister');
+            }
+        };
+
+        fetchProfileData();
+    }, [navigate]);
+
+    const getFieldValue = (value) => {
+        return value || 'N/A';
+    };
 
     return (
-        <div className="bg-white-100 text-white font-sans min-h-screen flex flex-col">
-            {/* Header */}
+        <div className={`min-h-screen flex flex-col ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
             <Header />
+            <div className="flex-1 container mx-auto p-6">
+                <div className="mt-10 flex flex-col lg:flex-row w-full lg:w-1/2 min-h-[800px] container mx-auto p-8">
+                    <main className={`flex-1 rounded-lg p-8 shadow-lg ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
+                        <div className="flex flex-col items-center lg:flex-row lg:items-start mb-6">
+                            {profileData?.profile_picture ? (
+                                <img
+                                    src={`http://localhost:5001/uploads/${profileData.profile_picture}`}
+                                    alt="Profile"
+                                    className="w-24 h-24 rounded-full object-cover mb-4 lg:mb-0 lg:mr-4"
+                                />
+                            ) : (
+                                <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center mb-4 lg:mb-0 lg:mr-4">
+                                    <span className="text-gray-500">No Photo</span>
+                                </div>
+                            )}
+                            <div className="text-center lg:text-left">
+                                <h2 className={`text-3xl font-semibold mt-6 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                                    {profileData ? getFieldValue(profileData.name) : 'Loading...'}
+                                </h2>
+                                <span className={`flex items-center ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
+                                    <FaStar className="text-yellow-400 mr-1" /> 100 Points
+                                </span>
+                            </div>
 
-            {/* Profile Page Content */}
-            <div className="text-black mt-10 flex flex-col lg:flex-row w-full lg:w-1/2 min-h-[800px] container mx-auto p-8">
-                <main className="flex-1 bg-white rounded-lg p-8">
-                    <div className="flex flex-col items-center lg:flex-row lg:items-start mb-6">
-                        {/* Profile Picture */}
-                        <img
-                            src="./images/Profile.jpg"
-                            alt="Profile"
-                            className="w-24 h-24 rounded-full object-cover mb-4 lg:mb-0 lg:mr-4"
-                        />
-                        {/* Profile Info */}
-                        <div className="text-center lg:text-left">
-                            <h2 className="text-3xl font-semibold mt-6">My Profile</h2>
-                            <span className="text-gray-600 flex items-center">
-                                <FaStar className="text-yellow-400 mr-1" /> 100 Points
-                            </span>
+                            <button
+                                onClick={() => navigate('/edit-profile')}
+                                className="lg:ml-auto bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md transition-colors"
+                            >
+                                Edit Profile
+                            </button>
                         </div>
 
-                        <button
-                            onClick={() => navigate('/edit-profile')}
-                            className="lg:ml-auto bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md"
-                        >
-                            Edit Profile
-                        </button>
-                    </div>
+                        <div className="space-y-4">
+                            <div>
+                                <label className={`block font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Bio</label>
+                                <p className={`w-full p-2 border rounded-md ${
+                                    theme === "dark"
+                                    ? "bg-gray-700 text-gray-300 border-gray-600"
+                                    : "bg-gray-100 text-gray-900 border-gray-300"
+                                }`}>
+                                    {profileData ? getFieldValue(profileData.bio) : 'Loading...'}
+                                </p>
+                            </div>
 
-                    {/* Profile Fields */}
-                    <div className="space-y-4">
+                            <div>
+                                <label className={`block font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Username</label>
+                                <p className={`w-full p-2 border rounded-md ${
+                                    theme === "dark"
+                                    ? "bg-gray-700 text-gray-300 border-gray-600"
+                                    : "bg-gray-100 text-gray-900 border-gray-300"
+                                }`}>
+                                    {profileData ? getFieldValue(profileData.name) : 'Loading...'}
+                                </p>
+                            </div>
 
-                        {/* Bio */}
-                        <div>
-                            <label className="block text-gray-700 font-medium">Bio</label>
-                            <p className="w-full p-2 border border-gray-300 rounded-md bg-gray-100">
-                                Hello!
-                            </p>
+                            <div>
+                                <label className={`block font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Email</label>
+                                <p className={`w-full p-2 border rounded-md ${
+                                    theme === "dark"
+                                    ? "bg-gray-700 text-gray-300 border-gray-600"
+                                    : "bg-gray-100 text-gray-900 border-gray-300"
+                                }`}>
+                                    {profileData ? getFieldValue(profileData.email) : 'Loading...'}
+                                </p>
+                            </div>
+
+                            <div>
+                                <label className={`block font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Address</label>
+                                <p className={`w-full p-2 border rounded-md ${
+                                    theme === "dark"
+                                    ? "bg-gray-700 text-gray-300 border-gray-600"
+                                    : "bg-gray-100 text-gray-900 border-gray-300"
+                                }`}>
+                                    {profileData ? getFieldValue(profileData.address) : 'Loading...'}
+                                </p>
+                            </div>
+
+                            <div>
+                                <label className={`block font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>Contact Number</label>
+                                <p className={`w-full p-2 border rounded-md ${
+                                    theme === "dark"
+                                    ? "bg-gray-700 text-gray-300 border-gray-600"
+                                    : "bg-gray-100 text-gray-900 border-gray-300"
+                                }`}>
+                                    {profileData ? getFieldValue(profileData.phone) : 'Loading...'}
+                                </p>
+                            </div>
+
+                            <div>
+                                <label className={`block font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>City</label>
+                                <p className={`w-full p-2 border rounded-md ${
+                                    theme === "dark"
+                                    ? "bg-gray-700 text-gray-300 border-gray-600"
+                                    : "bg-gray-100 text-gray-900 border-gray-300"
+                                }`}>
+                                    N/A
+                                </p>
+                            </div>
+                            
+                            <div>
+                                <label className={`block font-medium ${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>My Department</label>
+                                <p className={`w-full p-2 border rounded-md ${
+                                    theme === "dark"
+                                    ? "bg-gray-700 text-gray-300 border-gray-600"
+                                    : "bg-gray-100 text-gray-900 border-gray-300"
+                                }`}>
+                                    N/A
+                                </p>
+                            </div>
                         </div>
-
-                        {/* Username */}
-                        <div>
-                            <label className="block text-gray-700 font-medium">Username</label>
-                            <p className="w-full p-2 border border-gray-300 rounded-md bg-gray-100">
-                                Leman
-                            </p>
-                        </div>
-
-                        {/* Email */}
-                        <div>
-                            <label className="block text-gray-700 font-medium">Email</label>
-                            <p className="w-full p-2 border border-gray-300 rounded-md bg-gray-100">
-                                lemansuleymanova@gmail.com
-                            </p>
-                        </div>
-
-                        {/* Address */}
-                        <div>
-                            <label className="block text-gray-700 font-medium">Address</label>
-                            <p className="w-full p-2 border border-gray-300 rounded-md bg-gray-100">
-                                Ganclik m/s, Ziya Bunyadzade.
-                            </p>
-                        </div>
-
-                        {/* Contact Number */}
-                        <div>
-                            <label className="block text-gray-700 font-medium">Contact Number</label>
-                            <p className="w-full p-2 border border-gray-300 rounded-md bg-gray-100">
-                                +994123456789
-                            </p>
-                        </div>
-
-                        {/* City */}
-                        <div>
-                            <label className="block text-gray-700 font-medium">City</label>
-                            <p className="w-full p-2 border border-gray-300 rounded-md bg-gray-100">
-                                Baku
-                            </p>
-                        </div>
-                        
-                        {/* Department */}
-                        <div>
-                            <label className="block text-gray-700 font-medium">My Department</label>
-                            <p className="w-full p-2 border border-gray-300 rounded-md bg-gray-100">
-                                ITE
-                            </p>
-                        </div>
-                    </div>
-
-                </main>
+                    </main>
+                </div>
             </div>
         </div>
     );

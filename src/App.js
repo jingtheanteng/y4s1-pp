@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider } from './Page/ThemeContext';
 import AdminHome from './Admin/Home';
 import UserHome from './User/Home';
 import LoginRegister from './Page/LoginRegister';
@@ -23,31 +24,33 @@ import CommentList from './Admin/Comment/CommentList';
 
 function App() {
     return (
-        <Router>
-            <Routes>
-                {/* Routes for Admin and User */}
-                <Route path="/admin" element={<AdminHome />} />
-                <Route path="/admin/users" element={<UserList />} />
-                <Route path="/admin/category" element={<CategoryList />} />
-                <Route path="/admin/department" element={<DepartmentList />} />
-                <Route path="/admin/faculty" element={<FacultyList />} />
-                <Route path="/admin/posts" element={<PostList />} />
-                <Route path="/admin/comments" element={<CommentList />} />
-                <Route path="/user" element={<UserHome />} />
-                <Route path="/" element={<Home />} />
-                <Route path="/loginregister" element={<LoginRegister />} />
-                <Route path="/communities" element={<Communities />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/setting" element={<Setting />} />
-                <Route path="/notification" element={<Notification />} />
-                <Route path="/forget-password" element={<ForgetPassword />} />
-                <Route path="/edit-profile" element={<EditProfile />} />
-                <Route path="/department-community" element={<DepartmentCommunity />} />
-                <Route path="/post-detail/:id" element={<PostDetail />} />
-                <Route path="/view-profile" element={<ViewProfile />} />
-                <Route path="/home-loggedin" element={<LoggedIn />} />
-            </Routes>
-        </Router>
+        <ThemeProvider>
+            <Router>
+                <Routes>
+                    {/* Routes for Admin and User */}
+                    <Route path="/admin" element={<AdminHome />} />
+                    <Route path="/admin/users" element={<UserList />} />
+                    <Route path="/admin/category" element={<CategoryList />} />
+                    <Route path="/admin/department" element={<DepartmentList />} />
+                    <Route path="/admin/faculty" element={<FacultyList />} />
+                    <Route path="/admin/posts" element={<PostList />} />
+                    <Route path="/admin/comments" element={<CommentList />} />
+                    <Route path="/user" element={<UserHome />} />
+                    <Route path="/" element={<Home />} />
+                    <Route path="/loginregister" element={<LoginRegister />} />
+                    <Route path="/communities" element={<Communities />} />
+                    <Route path="/profile" element={<Profile />} />
+                    <Route path="/setting" element={<Setting />} />
+                    <Route path="/notification" element={<Notification />} />
+                    <Route path="/forget-password" element={<ForgetPassword />} />
+                    <Route path="/edit-profile" element={<EditProfile />} />
+                    <Route path="/department-community/:departmentId" element={<DepartmentCommunity />} />
+                    <Route path="/post-detail/:id" element={<PostDetail />} />
+                    <Route path="/viewprofile/:userId" element={<ViewProfile />} />
+                    <Route path="/home-loggedin" element={<LoggedIn />} />
+                </Routes>
+            </Router>
+        </ThemeProvider>
     );
 }
 

@@ -13,7 +13,9 @@ function EditProfile() {
         bio: '',
         email: '',
         address: '',
-        phone: ''
+        phone: '',
+        city: '',
+        department: ''
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -60,7 +62,9 @@ function EditProfile() {
                             bio: currentUser.bio || '',
                             email: currentUser.email || '',
                             address: currentUser.address || '',
-                            phone: currentUser.phone || ''
+                            phone: currentUser.phone || '',
+                            city: currentUser.city || '',
+                            department: currentUser.department || ''
                         });
                     }
                 }
@@ -291,16 +295,19 @@ function EditProfile() {
                                     City
                                 </label>
                                 <select
+                                    name="city"
+                                    value={formData.city}
+                                    onChange={handleInputChange}
                                     className={`w-full px-2 py-2 rounded-md focus:ring-2 focus:ring-orange-500 appearance-none ${
                                         theme === "dark"
                                         ? "bg-gray-700 text-gray-300 border-gray-600"
                                         : "bg-white text-gray-900 border-gray-300"
                                     } border`}
                                 >
-                                    <option>Choose Your City</option>
-                                    <option>Baku</option>
-                                    <option>Ganja</option>
-                                    <option>Sumqayit</option>
+                                    <option value="">Choose Your City</option>
+                                    <option value="Phnom Penh">Phnom Penh</option>
+                                    <option value="Siem Reap">Siem Reap</option>
+                                    <option value="Battambang">Battambang</option>
                                 </select>
                                 <span className={`absolute top-1/2 right-2 transform pointer-events-none ${
                                     theme === "dark" ? "text-gray-400" : "text-gray-500"
@@ -314,16 +321,19 @@ function EditProfile() {
                                     My Department
                                 </label>
                                 <select
+                                    name="department"
+                                    value={formData.department}
+                                    onChange={handleInputChange}
                                     className={`w-full px-2 py-2 rounded-md focus:ring-2 focus:ring-orange-500 appearance-none ${
                                         theme === "dark"
                                         ? "bg-gray-700 text-gray-300 border-gray-600"
                                         : "bg-white text-gray-900 border-gray-300"
                                     } border`}
                                 >
-                                    <option>Choose Your Department</option>
-                                    <option>ITE</option>
-                                    <option>Data Science</option>
-                                    <option>History</option>
+                                    <option value="">Choose Your Department</option>
+                                    <option value="ITE">ITE</option>
+                                    <option value="Data Science">Data Science</option>
+                                    <option value="History">History</option>
                                 </select>
                                 <span className={`absolute top-1/2 right-2 transform pointer-events-none ${
                                     theme === "dark" ? "text-gray-400" : "text-gray-500"

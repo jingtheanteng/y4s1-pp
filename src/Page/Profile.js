@@ -44,7 +44,10 @@ function Profile() {
                 if (userData.status === 'success' && userData.data) {
                     const currentUser = userData.data.find(user => user.id === validateData.data.user_id);
                     if (currentUser) {
+                        console.log('Current user points:', currentUser.points); // Debug log
                         setProfileData(currentUser);
+                        // Update the user data in localStorage
+                        localStorage.setItem('user', JSON.stringify(currentUser));
                     }
                 }
             } catch (error) {
@@ -54,6 +57,12 @@ function Profile() {
         };
 
         fetchProfileData();
+
+        // Set up an interval to refresh the profile data every 5 seconds
+        const intervalId = setInterval(fetchProfileData, 5000);
+
+        // Cleanup interval on component unmount
+        return () => clearInterval(intervalId);
     }, [navigate]);
 
     const getFieldValue = (value) => {
@@ -67,23 +76,19 @@ function Profile() {
                 <div className="mt-10 flex flex-col lg:flex-row w-full lg:w-1/2 min-h-[800px] container mx-auto p-8">
                     <main className={`flex-1 rounded-lg p-8 shadow-lg ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
                         <div className="flex flex-col items-center lg:flex-row lg:items-start mb-6">
-                            {profileData?.profile_picture ? (
-                                <img
-                                    src={`http://localhost:5001/uploads/${profileData.profile_picture}`}
-                                    alt="Profile"
-                                    className="w-24 h-24 rounded-full object-cover mb-4 lg:mb-0 lg:mr-4"
-                                />
-                            ) : (
-                                <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center mb-4 lg:mb-0 lg:mr-4">
-                                    <span className="text-gray-500">No Photo</span>
-                                </div>
-                            )}
+                            <img
+                                src={profileData?.profile_picture 
+                                    ? `http://localhost:5001/uploads/${profileData.profile_picture}`
+                                    : "./images/default-profile.jpg"}
+                                alt="Profile"
+                                className="w-24 h-24 rounded-full object-cover mb-4 lg:mb-0 lg:mr-4"
+                            />
                             <div className="text-center lg:text-left">
                                 <h2 className={`text-3xl font-semibold mt-6 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
                                     {profileData ? getFieldValue(profileData.name) : 'Loading...'}
                                 </h2>
                                 <span className={`flex items-center ${theme === "dark" ? "text-gray-300" : "text-gray-600"}`}>
-                                    <FaStar className="text-yellow-400 mr-1" /> 100 Points
+                                    <FaStar className="text-yellow-400 mr-1" /> {profileData && typeof profileData.points !== 'undefined' ? profileData.points : 0} Points
                                 </span>
                             </div>
 
@@ -158,7 +163,7 @@ function Profile() {
                                     ? "bg-gray-700 text-gray-300 border-gray-600"
                                     : "bg-gray-100 text-gray-900 border-gray-300"
                                 }`}>
-                                    N/A
+                                    {profileData ? getFieldValue(profileData.city) : 'Loading...'}
                                 </p>
                             </div>
                             
@@ -169,7 +174,7 @@ function Profile() {
                                     ? "bg-gray-700 text-gray-300 border-gray-600"
                                     : "bg-gray-100 text-gray-900 border-gray-300"
                                 }`}>
-                                    N/A
+                                    {profileData ? getFieldValue(profileData.department) : 'Loading...'}
                                 </p>
                             </div>
                         </div>

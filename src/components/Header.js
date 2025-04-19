@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaSearch, FaBell } from "react-icons/fa";
+import { FaSearch, FaBell, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { FaSignOutAlt } from 'react-icons/fa';
 import { useTheme } from '../Page/ThemeContext';
+import axios from 'axios';
 
 function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -12,6 +12,7 @@ function Header() {
     const [isDropdownVisible, setDropdownVisible] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userData, setUserData] = useState(null);
+    const [unreadNotifications, setUnreadNotifications] = useState(0);
     const { theme } = useTheme();
 
     // Check login status from localStorage
@@ -24,6 +25,8 @@ function Header() {
                 const parsedUser = JSON.parse(user);
                 setUserData(parsedUser);
                 setIsLoggedIn(true);
+                // Fetch unread notifications when user is logged in
+                fetchUnreadNotifications(parsedUser.id);
             } catch (error) {
                 console.error("Error parsing user data:", error);
                 // Clear invalid data
@@ -32,6 +35,18 @@ function Header() {
             }
         }
     }, [location]); // Re-check when location changes
+
+    const fetchUnreadNotifications = async (userId) => {
+        try {
+            const response = await axios.get(`http://localhost:5001/notifications/${userId}`);
+            if (response.data.status) {
+                const unreadCount = response.data.data.filter(notification => !notification.is_read).length;
+                setUnreadNotifications(unreadCount);
+            }
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
+    };
 
     const handleSignInClick = () => navigate('/loginregister');
     const handleHomeClick = () => navigate('/');
@@ -111,10 +126,17 @@ function Header() {
 
                 {/* Search Bar and Profile Section */}
                 <div className="flex flex-col lg:flex-row items-center space-y-4 lg:space-y-0 lg:space-x-9">
-                    <FaBell 
-                        className={`cursor-pointer w-9 h-9 p-2 rounded-md hover:bg-orange-500 active:bg-orange-500 ${isNotification ? 'text-orange-500' : 'text-white'}`}
-                        onClick={handleNotificationClick}
-                    />
+                    <div className="relative">
+                        <FaBell 
+                            className={`cursor-pointer w-9 h-9 p-2 rounded-md hover:bg-orange-500 active:bg-orange-500 ${isNotification ? 'text-orange-500' : 'text-white'}`}
+                            onClick={handleNotificationClick}
+                        />
+                        {unreadNotifications > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                {unreadNotifications}
+                            </span>
+                        )}
+                    </div>
                     {/* Search Bar */}
                     <div className={`flex justify-center mt-4 lg:mt-0 lg:ml-4 ${menuOpen ? 'hidden' : ''}`}>
                         <div className="text-black relative w-full max-w-md">
@@ -184,6 +206,7 @@ function Header() {
                             )}
                         </div>
                     )}
+                    
                 </div>
             </div>
         </header>

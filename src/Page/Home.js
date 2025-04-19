@@ -15,6 +15,7 @@ function Home() {
     const [departments, setDepartments] = useState([]);
     const [categories, setCategories] = useState([]);
     const [pinnedDepartments, setPinnedDepartments] = useState([]);
+    const [popularDepartments, setPopularDepartments] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [sortBy, setSortBy] = useState('created_at');
@@ -33,6 +34,7 @@ function Home() {
         fetchDepartments();
         fetchCategories();
         fetchPinnedDepartments();
+        fetchPopularDepartments();
     }, [currentPage, sortBy]);
 
     const fetchDepartments = async () => {
@@ -87,6 +89,21 @@ function Home() {
         }
     };
 
+    const fetchPopularDepartments = async () => {
+        try {
+            const response = await fetch(`${API_URL}/department/popular`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch popular departments');
+            }
+            const data = await response.json();
+            if (data.status) {
+                setPopularDepartments(data.data);
+            }
+        } catch (err) {
+            console.error('Error fetching popular departments:', err);
+        }
+    };
+
     const fetchPosts = async () => {
         try {
             const response = await fetch(`${API_URL}/post?page=${currentPage}&limit=3&sort_by=${sortBy}&sort_order=DESC`);
@@ -113,30 +130,58 @@ function Home() {
 
     const handleCreatePost = async () => {
         try {
-            // Get the current user ID from localStorage or your auth context
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (!user) {
-                throw new Error('User not logged in');
+            // Get the session token from localStorage
+            const token = localStorage.getItem('token');
+            if (!token) {
+                navigate('/loginregister');
+                return;
             }
 
-            // Validate category selection
+            // First validate the session
+            const validateResponse = await fetch('http://localhost:5001/session/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token })
+            });
+
+            const validateData = await validateResponse.json();
+            
+            if (!validateData.status || !validateData.data.valid) {
+                localStorage.removeItem('token');
+                navigate('/loginregister');
+                return;
+            }
+
+            // Validate required fields
             if (!newPost.category_id) {
-                throw new Error('Please select a category');
+                alert('Please select a category');
+                return;
+            }
+            if (!newPost.department_id) {
+                alert('Please select a community');
+                return;
+            }
+            if (!newPost.name.trim()) {
+                alert('Please enter a post title');
+                return;
             }
 
-            const response = await fetch(`${API_URL}/post`, {
+            const response = await fetch('http://localhost:5001/post', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     ...newPost,
-                    owner_id: user.id
+                    owner_id: validateData.data.user_id
                 }),
             });
 
             if (!response.ok) {
-                throw new Error('Failed to create post');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to create post');
             }
 
             const data = await response.json();
@@ -150,8 +195,19 @@ function Home() {
                 });
                 setCurrentPage(1); // Reset to first page after creating new post
                 fetchPosts();
+
+                // Refresh user data to update points
+                const userResponse = await fetch('http://localhost:5001/user');
+                const userData = await userResponse.json();
+                if (userData.status === 'success' && userData.data) {
+                    const currentUser = userData.data.find(user => user.id === validateData.data.user_id);
+                    if (currentUser) {
+                        // Update the user data in localStorage
+                        localStorage.setItem('user', JSON.stringify(currentUser));
+                    }
+                }
             } else {
-                throw new Error(data.message);
+                throw new Error(data.message || 'Failed to create post');
             }
         } catch (err) {
             console.error('Error creating post:', err);
@@ -200,12 +256,12 @@ function Home() {
                             </button>
                             <button 
                                 onClick={() => {
-                                    setSortBy('likes');
+                                    setSortBy('trending');
                                     setCurrentPage(1);
                                 }}
                                 className={`text-left text-xl font-semibold mb-2 ${theme === "dark" ? "text-white bg-gray-800 hover:bg-gray-700" : "text-gray-900 bg-white hover:bg-gray-100"} p-2 rounded-md focus:outline-none w-full transition-colors`}>
                                 Trending
-                                <p className={`text-sm font-normal ${theme === "dark" ? "text-gray-300" : "text-gray-600"} mt-1`}>Shots featured today by curators</p>
+                                <p className={`text-sm font-normal ${theme === "dark" ? "text-gray-300" : "text-gray-600"} mt-1`}>Most engaged posts by likes and comments</p>
                             </button>
                         </aside>
 
@@ -241,21 +297,30 @@ function Home() {
                         <aside className={`${theme === "dark" ? "bg-gray-900" : "bg-gray-50"} p-4 rounded-md`}>
                             <h3 className={`text-xl font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>Popular Communities</h3>
                             <ul>
-                                <li className="mb-2">
-                                    <button className={`w-full text-left px-4 py-2 rounded-md ${theme === "dark" ? "bg-gray-800 hover:bg-gray-700 text-white" : "bg-white hover:bg-gray-100 text-gray-900"} transition-colors`}>
-                                        Software Engineering
-                                    </button>
-                                </li>
-                                <li className="mb-2">
-                                    <button className={`w-full text-left px-4 py-2 rounded-md ${theme === "dark" ? "bg-gray-800 hover:bg-gray-700 text-white" : "bg-white hover:bg-gray-100 text-gray-900"} transition-colors`}>
-                                        Information Technology
-                                    </button>
-                                </li>
-                                <li className="mb-2">
-                                    <button className={`w-full text-left px-4 py-2 rounded-md ${theme === "dark" ? "bg-gray-800 hover:bg-gray-700 text-white" : "bg-white hover:bg-gray-100 text-gray-900"} transition-colors`}>
-                                        Data Science
-                                    </button>
-                                </li>
+                                {popularDepartments.length > 0 ? (
+                                    popularDepartments.map((department) => (
+                                        <li key={department.id} className="mb-2">
+                                            <button 
+                                                onClick={() => navigate(`/department-community/${department.id}`)}
+                                                className={`w-full text-left px-4 py-2 rounded-md ${theme === "dark" ? "bg-gray-800 hover:bg-gray-700 text-white" : "bg-white hover:bg-gray-100 text-gray-900"} transition-colors`}
+                                            >
+                                                {department.name}
+                                                {department.faculty_name && (
+                                                    <span className={`text-xs ml-2 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+                                                        ({department.faculty_name})
+                                                    </span>
+                                                )}
+                                                <span className={`text-xs ml-2 ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+                                                    {department.post_count} posts
+                                                </span>
+                                            </button>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-500"}`}>
+                                        No popular communities yet
+                                    </li>
+                                )}
                             </ul>
                         </aside>
                     </div>
@@ -321,13 +386,14 @@ function Home() {
                                         name="category_id"
                                         value={newPost.category_id}
                                         onChange={handleInputChange}
+                                        required
                                         className={`appearance-none p-2 rounded-md focus:ring-2 focus:ring-orange-500 w-full pr-10 ${
                                             theme === "dark"
                                             ? "bg-gray-700 text-white border-gray-600"
                                             : "bg-white text-gray-900 border-gray-300"
-                                        } border`}
+                                        } border ${!newPost.category_id ? 'border-red-500' : ''}`}
                                     >
-                                        <option value="" disabled selected>
+                                        <option value="" disabled>
                                             Select Category
                                         </option>
                                         {categories.map(category => (
@@ -346,13 +412,14 @@ function Home() {
                                         name="department_id"
                                         value={newPost.department_id}
                                         onChange={handleInputChange}
+                                        required
                                         className={`appearance-none p-2 rounded-md focus:ring-2 focus:ring-orange-500 w-full pr-10 ${
                                             theme === "dark"
                                             ? "bg-gray-700 text-white border-gray-600"
                                             : "bg-white text-gray-900 border-gray-300"
-                                        } border`}
+                                        } border ${!newPost.department_id ? 'border-red-500' : ''}`}
                                     >
-                                        <option value="" disabled selected>
+                                        <option value="" disabled>
                                             Select Community
                                         </option>
                                         {departments.map(department => (

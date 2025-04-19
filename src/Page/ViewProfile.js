@@ -139,7 +139,7 @@ function ViewProfile() {
                                 <p className="text-blue-500 font-medium mt-1">{user.phone || 'No phone number'}</p>
                                 <div className="flex items-center justify-center mt-2">
                                     <FaStar className="text-yellow-400 mr-2" />
-                                    <span className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>100 Points</span>
+                                    <span className={`${theme === "dark" ? "text-gray-300" : "text-gray-700"}`}>{user.points || 0} Points</span>
                                 </div>
                             </div>
                         </div>

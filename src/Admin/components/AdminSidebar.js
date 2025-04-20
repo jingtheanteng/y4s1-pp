@@ -123,6 +123,22 @@ function AdminSidebar() {
               )}
             </a>
           </li>
+          <li>
+            <a 
+              href="/admin/reports" 
+              className={`flex items-center p-2 rounded ${
+                currentPath.includes('/admin/reports') 
+                  ? 'bg-blue-600 text-white font-bold' 
+                  : 'hover:bg-gray-700'
+              }`}
+            >
+              <FaFileAlt className="mr-3" />
+              <span>Reports</span>
+              {currentPath.includes('/admin/reports') && (
+                <span className="ml-auto h-2 w-2 rounded-full bg-white"></span>
+              )}
+            </a>
+          </li>
         </ul>
       </nav>
     </div>

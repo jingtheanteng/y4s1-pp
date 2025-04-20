@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-function Comment({ closePopup, replyToName = 'Post', parentCommentId = null }) {
+function Comment({ closePopup, replyToName = 'Post', parentCommentId = null, replyToUserId = null }) {
   const [commentText, setCommentText] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { id } = useParams(); // Get the post ID from URL parameters
@@ -26,17 +26,21 @@ function Comment({ closePopup, replyToName = 'Post', parentCommentId = null }) {
         return;
       }
 
+      // For replies to specific users, prepend the username to the comment text
+      // This helps identify who a reply is directed to when displaying comments
+      let finalCommentText = commentText;
+      if (replyToName && replyToName !== 'Post' && parentCommentId) {
+        finalCommentText = `@${replyToName} ${commentText}`;
+      }
+
       // Create the comment data
       const commentData = {
-        name: commentText,
+        name: finalCommentText,
         post_id: id,
-        owner_id: user.id
+        owner_id: user.id,
+        parent_comment_id: parentCommentId, // This will be null for main comments and set for replies
+        replied_to_id: replyToUserId // Store the ID of the user being replied to
       };
-
-      // Only add parent_comment_id if it exists (for replies)
-      if (parentCommentId !== null) {
-        commentData.parent_comment_id = parentCommentId;
-      }
 
       const response = await fetch(`${API_URL}/comment`, {
         method: 'POST',
@@ -83,16 +87,6 @@ function Comment({ closePopup, replyToName = 'Post', parentCommentId = null }) {
             onChange={handleChange}
             disabled={isSubmitting}
           ></textarea>
-
-          {/* Attachment Section */}
-          <div className="mt-6">
-            <label className="text-md text-gray-500 block mb-2">Attachment</label>
-            <input
-              type="file"
-              className="w-full border rounded-md p-3 text-sm focus:outline-none text-gray-800"
-              disabled={isSubmitting}
-            />
-          </div>
 
           {/* Buttons */}
           <div className="mt-6 flex justify-between sm:justify-end space-x-4">

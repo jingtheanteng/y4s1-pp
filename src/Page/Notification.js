@@ -10,6 +10,7 @@ function Notification() {
     const { theme } = useTheme();
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [clearing, setClearing] = useState(false);
 
     useEffect(() => {
         const fetchNotifications = async () => {
@@ -50,6 +51,25 @@ function Notification() {
         }
     };
 
+    const handleClearAll = async () => {
+        try {
+            const userData = JSON.parse(localStorage.getItem('user'));
+            
+            if (!userData || !userData.id) return;
+            
+            setClearing(true);
+            const response = await axios.delete(`http://localhost:5001/notifications/${userData.id}/clear`);
+            
+            if (response.data.status) {
+                setNotifications([]);
+            }
+        } catch (error) {
+            console.error('Error clearing notifications:', error);
+        } finally {
+            setClearing(false);
+        }
+    };
+
     const formatTimeAgo = (timestamp) => {
         const date = new Date(timestamp);
         const now = new Date();
@@ -69,9 +89,24 @@ function Notification() {
 
             <div className={`flex-1 container mx-auto p-6 ${theme === "dark" ? "text-white" : "text-black"}`}>
                 <main className="flex-1">
-                    <h1 className={`text-3xl font-semibold mb-6 ${theme === "dark" ? "text-white" : "text-black"}`}>
-                        Notifications
-                    </h1>
+                    <div className="flex justify-between items-center mb-6">
+                        <h1 className={`text-3xl font-semibold ${theme === "dark" ? "text-white" : "text-black"}`}>
+                            Notifications
+                        </h1>
+                        {notifications.length > 0 && (
+                            <button 
+                                onClick={handleClearAll}
+                                disabled={clearing}
+                                className={`px-4 py-2 rounded-md ${
+                                    theme === "dark" 
+                                        ? "bg-red-600 hover:bg-red-700 text-white" 
+                                        : "bg-red-500 hover:bg-red-600 text-white"
+                                } transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed`}
+                            >
+                                {clearing ? 'Clearing...' : 'Clear All'}
+                            </button>
+                        )}
+                    </div>
 
                     {loading ? (
                         <div className="text-center py-8">

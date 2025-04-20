@@ -21,6 +21,7 @@ function PostDetail() {
   const [likedComments, setLikedComments] = useState({});
   const [replyToName, setReplyToName] = useState(''); // Track who we're replying to
   const [replyToId, setReplyToId] = useState(null); // Track which comment we're replying to
+  const [replyToUserID, setReplyToUserID] = useState(null); // Track the user ID we're replying to
   
   const [showPopup, setShowCommentPopup] = useState(false); // Popup visibility
   const [showReportPopup, setShowReportPopup] = useState(false); // State for Report popup
@@ -93,10 +94,48 @@ function PostDetail() {
           const parentComments = data.data.filter(comment => !comment.parent_comment_id);
           const replies = data.data.filter(comment => comment.parent_comment_id);
           
+          // Create a map of comment authors for quick lookup
+          const commentAuthors = {};
+          data.data.forEach(comment => {
+            commentAuthors[comment.id] = {
+              owner_id: comment.owner_id,
+              owner_name: comment.owner_name
+            };
+          });
+          
+          // Map a reply to its parent and store who is being replied to
+          const repliesWithReplyInfo = replies.map(reply => {
+            // Store parent information (defaults to parent comment owner)
+            let replyInfo = {
+              ...reply,
+              // Default to the parent comment's author
+              replied_to_id: commentAuthors[reply.parent_comment_id].owner_id,
+              replied_to_name: commentAuthors[reply.parent_comment_id].owner_name
+            };
+            
+            // If the content starts with a mention like "@username", extract it
+            const mentionMatch = reply.name.match(/^@(\S+)/);
+            if (mentionMatch) {
+              // Look for the username in our commentAuthors
+              const mentionedName = mentionMatch[1];
+              // Find the comment author with this name
+              const matchedAuthor = Object.values(commentAuthors).find(
+                author => author.owner_name.toLowerCase() === mentionedName.toLowerCase()
+              );
+              
+              if (matchedAuthor) {
+                replyInfo.replied_to_id = matchedAuthor.owner_id;
+                replyInfo.replied_to_name = matchedAuthor.owner_name;
+              }
+            }
+            
+            return replyInfo;
+          });
+          
           // Attach replies to their parent comments
           const commentsWithReplies = parentComments.map(comment => ({
             ...comment,
-            replies: replies.filter(reply => reply.parent_comment_id === comment.id)
+            replies: repliesWithReplyInfo.filter(reply => reply.parent_comment_id === comment.id)
           }));
           
           setComments(commentsWithReplies);
@@ -233,9 +272,10 @@ function PostDetail() {
     }
   };
   
-  const handleComment = (replyTo = '', commentId = null) => {
+  const handleComment = (replyTo = '', commentId = null, replyToUserId = null) => {
     setReplyToName(replyTo || post?.owner_name || 'Post');
     setReplyToId(commentId);
+    setReplyToUserID(replyToUserId);
     setShowCommentPopup(true);
   };
 
@@ -243,11 +283,13 @@ function PostDetail() {
     setShowCommentPopup(false);
     setReplyToName('');
     setReplyToId(null);
+    setReplyToUserID(null);
   };
 
   const handleReply = (comment) => {
     setReplyToName(comment.owner_name);
     setReplyToId(comment.id); // This will be used as parent_comment_id
+    setReplyToUserID(comment.owner_id);
     setShowCommentPopup(true);
   };
 
@@ -499,7 +541,7 @@ function PostDetail() {
                         <p className={`text-sm font-semibold ${
                           theme === "dark" ? "text-white" : "text-gray-900"
                         }`}>
-                          {comment.owner_name}
+                          {reply.replied_to_name || comment.owner_name}
                         </p>
                       </div>
                       <p className={`text-xs ${
@@ -518,7 +560,7 @@ function PostDetail() {
                   </div>
                   <div className="mt-2">
                     <p className={theme === "dark" ? "text-gray-300" : "text-gray-700"}>
-                      {reply.name}
+                      {reply.name.replace(/^@\S+\s+/, '')}
                     </p>
                   </div>
                   <div className="flex space-x-4 mt-2">
@@ -536,7 +578,7 @@ function PostDetail() {
                       className={`flex items-center space-x-2 ${
                         theme === "dark" ? "text-gray-400" : "text-gray-600"
                       } hover:text-orange-500 transition-colors`}
-                      onClick={() => handleComment(reply.owner_name, comment.id)}
+                      onClick={() => handleComment(reply.owner_name, comment.id, reply.owner_id)}
                     >
                       <FaRegComment className="text-xl" />
                       <span>Reply</span>
@@ -559,7 +601,12 @@ function PostDetail() {
         ))}
 
         {/* Popup components */}
-        {showPopup && <CommentPopup closePopup={closePopup} replyToName={replyToName} parentCommentId={replyToId} />}
+        {showPopup && <CommentPopup 
+          closePopup={closePopup} 
+          replyToName={replyToName} 
+          parentCommentId={replyToId} 
+          replyToUserId={replyToUserID}
+        />}
         {showReportPopup && <ReportPopup closePopup={closeReportPopup} />}
       </div>
     </div>

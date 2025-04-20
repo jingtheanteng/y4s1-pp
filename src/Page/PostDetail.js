@@ -293,8 +293,31 @@ function PostDetail() {
     setShowCommentPopup(true);
   };
 
-  const handleReport = () => setShowReportPopup(true); // Show Report popup
+  const handleReport = (commentId = null, commentText = null) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) {
+      alert('Please log in to report content');
+      return;
+    }
+    
+    // Set the report content and type
+    setReportData({
+      commentId,
+      contentType: commentId ? 'comment' : 'post',
+      contentPreview: commentId ? commentText : post?.name
+    });
+    
+    setShowReportPopup(true);
+  };
+
   const closeReportPopup = () => setShowReportPopup(false); // Close Report popup
+
+  // Add state to store report data
+  const [reportData, setReportData] = useState({
+    commentId: null,
+    contentType: 'post',
+    contentPreview: ''
+  });
 
   if (loading) return <div className="text-center mt-10">Loading post details...</div>;
   if (error) return <div className="text-center mt-10 text-red-500">Error: {error}</div>;
@@ -407,7 +430,7 @@ function PostDetail() {
                 className={`flex items-center space-x-2 ${
                   theme === "dark" ? "text-gray-400" : "text-gray-600"
                 } hover:text-orange-500 transition-colors`}
-                onClick={handleReport}
+                onClick={() => handleReport()}
               >
                 <GrAnnounce className="text-xl" />
                 <span>Report</span>
@@ -496,7 +519,7 @@ function PostDetail() {
                   className={`flex items-center space-x-2 ${
                     theme === "dark" ? "text-gray-400" : "text-gray-600"
                   } hover:text-orange-500 transition-colors`}
-                  onClick={handleReport}
+                  onClick={() => handleReport(comment.id, comment.name)}
                 >
                   <GrAnnounce className="text-xl" />
                   <span>Report</span>
@@ -588,7 +611,7 @@ function PostDetail() {
                       className={`flex items-center space-x-2 ${
                         theme === "dark" ? "text-gray-400" : "text-gray-600"
                       } hover:text-orange-500 transition-colors`}
-                      onClick={handleReport}
+                      onClick={() => handleReport(reply.id, reply.name)}
                     >
                       <GrAnnounce className="text-xl" />
                       <span>Report</span>
@@ -607,7 +630,16 @@ function PostDetail() {
           parentCommentId={replyToId} 
           replyToUserId={replyToUserID}
         />}
-        {showReportPopup && <ReportPopup closePopup={closeReportPopup} />}
+        {showReportPopup && (
+          <ReportPopup 
+            closePopup={closeReportPopup} 
+            postId={id} 
+            commentId={reportData.commentId}
+            reporterId={JSON.parse(localStorage.getItem('user'))?.id}
+            contentType={reportData.contentType}
+            contentPreview={reportData.contentPreview}
+          />
+        )}
       </div>
     </div>
   );

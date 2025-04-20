@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useTheme } from './ThemeContext';
 
-function ReportPopup({ closePopup }) {
+function ReportPopup({ closePopup, postId, commentId, reporterId, contentType = "post", contentPreview = "" }) {
   const [selectedReason, setSelectedReason] = useState('');
   const [customReason, setCustomReason] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { theme } = useTheme();
-
+  
   const reasons = [
     'Spam or misleading',
     'Hate speech or symbols',
@@ -15,16 +16,54 @@ function ReportPopup({ closePopup }) {
     'Something else',
   ];
 
-  const handleReport = () => {
+  const handleReport = async () => {
     if (!selectedReason) {
       alert('Please select a reason for the report.');
       return;
     }
-    const reportDetails = customReason
-      ? `${selectedReason}: ${customReason}`
-      : selectedReason;
-    console.log('Report submitted:', reportDetails);
-    closePopup();
+    
+    if (!reporterId) {
+      alert('Missing user information.');
+      return;
+    }
+    
+    if ((!postId && !commentId) || (contentType === "post" && !postId) || (contentType === "comment" && !commentId)) {
+      alert('Missing content information.');
+      return;
+    }
+    
+    try {
+      setIsSubmitting(true);
+      
+      const response = await fetch('http://localhost:5001/report', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type: contentType,
+          reason: selectedReason,
+          description: selectedReason === 'Something else' ? customReason : '',
+          post_id: postId,
+          comment_id: commentId,
+          reporter_id: reporterId
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.status) {
+        alert('Report submitted successfully. Thank you for your feedback.');
+        closePopup();
+      } else {
+        alert(data.message || 'Failed to submit report. Please try again later.');
+      }
+    } catch (error) {
+      console.error('Error submitting report:', error);
+      alert('Failed to submit report. Please try again later.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -35,8 +74,18 @@ function ReportPopup({ closePopup }) {
         <h2 className={`text-2xl font-bold mb-6 text-center ${
           theme === "dark" ? "text-white" : "text-gray-800"
         }`}>
-          Report Comment
+          Report {contentType === "comment" ? "Comment" : "Post"}
         </h2>
+        
+        {contentPreview && (
+          <div className={`mb-6 p-3 rounded ${
+            theme === "dark" ? "bg-gray-700 text-gray-300" : "bg-gray-100 text-gray-700"
+          }`}>
+            <p className="text-sm font-medium mb-1">Content being reported:</p>
+            <p className="text-sm italic truncate">{contentPreview}</p>
+          </div>
+        )}
+        
         <div className="space-y-4">
           {reasons.map((reason) => (
             <label key={reason} className="flex items-center space-x-3 cursor-pointer">
@@ -70,19 +119,23 @@ function ReportPopup({ closePopup }) {
         <div className="mt-6 flex justify-between sm:justify-end space-x-4">
           <button
             onClick={closePopup}
+            disabled={isSubmitting}
             className={`px-6 py-3 rounded-lg text-lg w-full sm:w-auto transition-colors ${
               theme === "dark"
               ? "bg-gray-700 hover:bg-gray-600 text-white"
               : "bg-gray-300 hover:bg-gray-400 text-gray-800"
-            }`}
+            } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             Cancel
           </button>
           <button
             onClick={handleReport}
-            className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 text-lg w-full sm:w-auto transition-colors"
+            disabled={isSubmitting}
+            className={`px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 text-lg w-full sm:w-auto transition-colors ${
+              isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
-            Report
+            {isSubmitting ? 'Submitting...' : 'Report'}
           </button>
         </div>
       </div>

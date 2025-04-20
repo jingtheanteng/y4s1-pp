@@ -21,6 +21,7 @@ import DepartmentList from './Admin/Department/DepartmentList';
 import FacultyList from './Admin/Faculty/FacultyList';
 import PostList from './Admin/Post/PostList';
 import CommentList from './Admin/Comment/CommentList';
+import ReportList from './Admin/Report/ReportList';
 
 function App() {
     return (
@@ -35,6 +36,7 @@ function App() {
                     <Route path="/admin/faculty" element={<FacultyList />} />
                     <Route path="/admin/posts" element={<PostList />} />
                     <Route path="/admin/comments" element={<CommentList />} />
+                    <Route path="/admin/reports" element={<ReportList />} />
                     <Route path="/user" element={<UserHome />} />
                     <Route path="/" element={<Home />} />
                     <Route path="/loginregister" element={<LoginRegister />} />

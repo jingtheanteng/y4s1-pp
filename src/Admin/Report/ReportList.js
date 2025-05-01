@@ -370,11 +370,11 @@ function ReportList() {
                                     <FaCheck />
                                   </button>
                                   <button
-                                    className="text-yellow-500 hover:text-yellow-700 px-2 py-1 rounded-md border border-yellow-500 text-xs"
+                                    className="text-yellow-500 hover:text-yellow-700"
                                     title="Reject Report"
                                     onClick={() => handleUpdateStatus(report.id, 'rejected')}
                                   >
-                                    Reject
+                                    <FaTimes />
                                   </button>
                                 </>
                               )}

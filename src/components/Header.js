@@ -15,6 +15,9 @@ function Header() {
     const [userData, setUserData] = useState(null);
     const [unreadNotifications, setUnreadNotifications] = useState(0);
     const { theme } = useTheme();
+    const [searchResults, setSearchResults] = useState([]);
+    const [showSearchResults, setShowSearchResults] = useState(false);
+    const [searchTimeout, setSearchTimeout] = useState(null);
 
     // Check login status from localStorage
     useEffect(() => {
@@ -102,6 +105,48 @@ function Header() {
         alert("Logged out successfully!");
     };
 
+    const handleSearch = async (query) => {
+        if (query.length < 1) {
+            setSearchResults([]);
+            setShowSearchResults(false);
+            return;
+        }
+
+        try {
+            const response = await axios.get(`http://localhost:5001/search?q=${encodeURIComponent(query)}`);
+            if (response.data.status) {
+                setSearchResults(response.data.data);
+                setShowSearchResults(true);
+            }
+        } catch (error) {
+            console.error('Error searching:', error);
+            setSearchResults([]);
+        }
+    };
+
+    const handleSearchChange = (e) => {
+        const query = e.target.value;
+        setSearchTerm(query);
+
+        // Clear previous timeout
+        if (searchTimeout) {
+            clearTimeout(searchTimeout);
+        }
+
+        // Set new timeout for debouncing
+        const timeout = setTimeout(() => {
+            handleSearch(query);
+        }, 300);
+
+        setSearchTimeout(timeout);
+    };
+
+    const handleSearchResultClick = (postId) => {
+        setShowSearchResults(false);
+        setSearchTerm('');
+        navigate(`/post-detail/${postId}`);
+    };
+
     return (
         <header className="bg-gray-800 p-4 sticky-header">
             <div className="container mx-auto flex flex-col lg:flex-row items-center">
@@ -164,11 +209,35 @@ function Header() {
                                 placeholder="Type here to search"
                                 className="w-full p-2 pr-10 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={handleSearchChange}
+                                onFocus={() => searchTerm.length >= 1 && setShowSearchResults(true)}
+                                onBlur={() => setTimeout(() => setShowSearchResults(false), 200)}
                             />
                             <button className="absolute right-0 top-1/2 transform -translate-y-1/2 mr-2">
                                 <FaSearch className="text-gray-500" />
                             </button>
+
+                            {/* Search Results Popup */}
+                            {showSearchResults && searchResults.length > 0 && (
+                                <div className="absolute w-full mt-2 bg-white rounded-md shadow-lg max-h-96 overflow-y-auto z-50">
+                                    {searchResults.map((post) => (
+                                        <div
+                                            key={post.id}
+                                            className="p-3 hover:bg-gray-100 cursor-pointer border-b border-gray-200"
+                                            onClick={() => handleSearchResultClick(post.id)}
+                                        >
+                                            <h3 className="font-semibold text-gray-800">{post.name}</h3>
+                                            <p className="text-sm text-gray-600 truncate">{post.description}</p>
+                                            <div className="text-xs text-gray-500 mt-1">
+                                                <span>By {post.owner_name}</span>
+                                                {post.department_name && (
+                                                    <span className="ml-2">in {post.department_name}</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </div>
 

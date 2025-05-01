@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../../Components/Header';
 import AdminSidebar from '../Component/AdminSidebar';
-import { FaSearch, FaEdit, FaTrash, FaEye, FaSave, FaTimes, FaUnlock, FaLock } from 'react-icons/fa';
+import { FaSearch, FaEdit, FaTrash, FaEye, FaSave, FaTimes, FaUnlock, FaLock, FaUserPlus } from 'react-icons/fa';
 
 function UserList() {
   const [users, setUsers] = useState([]);
@@ -11,6 +11,17 @@ function UserList() {
   const [selectedUser, setSelectedUser] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: '',
+    email: '',
+    password: '',
+    bio: '',
+    address: '',
+    phone: '',
+    city: '',
+    department: ''
+  });
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
   useEffect(() => {
@@ -187,6 +198,59 @@ function UserList() {
     }));
   };
 
+  const handleCreateUser = async () => {
+    try {
+      if (!newUser.email || !newUser.password || !newUser.name) {
+        alert('Name, email and password are required');
+        return;
+      }
+
+      const response = await fetch(`${API_URL}/user/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newUser),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      if (result.status === true) {
+        // Refresh the user list
+        fetchUsers();
+        setIsCreatingUser(false);
+        setNewUser({
+          name: '',
+          email: '',
+          password: '',
+          bio: '',
+          address: '',
+          phone: '',
+          city: '',
+          department: ''
+        });
+        alert('User created successfully');
+      } else {
+        throw new Error(result.message || 'Failed to create user');
+      }
+    } catch (error) {
+      console.error("Error creating user:", error);
+      alert('An error occurred while creating the user. Please try again.');
+    }
+  };
+
+  const handleNewUserInputChange = (e) => {
+    const { name, value } = e.target;
+    setNewUser(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   // Filter users based on search term
   const filteredUsers = users.filter(user => 
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -206,16 +270,27 @@ function UserList() {
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
               
-              {/* Search Bar */}
-              <div className="relative w-64">
-                <input
-                  type="text"
-                  placeholder="Search users..."
-                  className="w-full p-2 pl-10 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <div className="flex items-center space-x-4">
+                {/* Create User Button */}
+                <button
+                  className="flex items-center px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  onClick={() => setIsCreatingUser(true)}
+                >
+                  <FaUserPlus className="mr-2" />
+                  Create Account
+                </button>
+                
+                {/* Search Bar */}
+                <div className="relative w-64">
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    className="w-full p-2 pl-10 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                </div>
               </div>
             </div>
             
@@ -379,6 +454,124 @@ function UserList() {
                       onClick={() => handleUserDelete(confirmDelete.id)}
                     >
                       Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Create User Modal */}
+            {isCreatingUser && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white p-6 rounded-lg shadow-lg max-w-2xl w-full">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-semibold">Create New User</h3>
+                    <button 
+                      className="text-gray-500 hover:text-gray-700"
+                      onClick={() => setIsCreatingUser(false)}
+                    >
+                      <FaTimes />
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                      <input
+                        type="text"
+                        name="name"
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newUser.name}
+                        onChange={handleNewUserInputChange}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                      <input
+                        type="email"
+                        name="email"
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newUser.email}
+                        onChange={handleNewUserInputChange}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                      <input
+                        type="password"
+                        name="password"
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newUser.password}
+                        onChange={handleNewUserInputChange}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                      <input
+                        type="text"
+                        name="phone"
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newUser.phone}
+                        onChange={handleNewUserInputChange}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                      <input
+                        type="text"
+                        name="city"
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newUser.city}
+                        onChange={handleNewUserInputChange}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                      <input
+                        type="text"
+                        name="department"
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newUser.department}
+                        onChange={handleNewUserInputChange}
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                      <input
+                        type="text"
+                        name="address"
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newUser.address}
+                        onChange={handleNewUserInputChange}
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                      <textarea
+                        name="bio"
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        value={newUser.bio}
+                        onChange={handleNewUserInputChange}
+                        rows="3"
+                      ></textarea>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end space-x-2">
+                    <button
+                      className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                      onClick={handleCreateUser}
+                    >
+                      Create User
+                    </button>
+                    <button
+                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+                      onClick={() => setIsCreatingUser(false)}
+                    >
+                      Cancel
                     </button>
                   </div>
                 </div>

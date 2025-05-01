@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './Page/ThemeContext';
 import AdminHome from './Admin/Home';
-import UserHome from './User/Home';
 import LoginRegister from './Page/LoginRegister';
 import Home from './Page/Home';
 import Profile from './Page/Profile';
@@ -37,7 +36,6 @@ function App() {
                     <Route path="/admin/posts" element={<PostList />} />
                     <Route path="/admin/comments" element={<CommentList />} />
                     <Route path="/admin/reports" element={<ReportList />} />
-                    <Route path="/user" element={<UserHome />} />
                     <Route path="/" element={<Home />} />
                     <Route path="/loginregister" element={<LoginRegister />} />
                     <Route path="/communities" element={<Communities />} />

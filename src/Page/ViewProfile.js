@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaStar } from "react-icons/fa6";
 import '../App.css';
-import Header from '../components/Header';
+import Header from '../Components/Header';
 import { useTheme } from './ThemeContext';
 
 function ViewProfile() {

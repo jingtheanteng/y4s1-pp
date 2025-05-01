@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
-import Header from '../components/Header';
+import Header from '../Components/Header';
 import { useTheme } from './ThemeContext';
 
 function Setting() {

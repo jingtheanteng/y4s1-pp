@@ -6,7 +6,7 @@ import { GrAnnounce } from "react-icons/gr";
 import CommentPopup from './Comment'; // Import the Popup component
 import ReportPopup from './Report'; // Import the Popup component
 import '../App.css';
-import Header from '../components/Header';
+import Header from '../Components/Header';
 import { useTheme } from './ThemeContext';
 
 function PostDetail() {

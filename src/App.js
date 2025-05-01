@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './Page/ThemeContext';
-import AdminHome from './Admin/Home';
+import AdminHome from './Admin/Dashboard/Home';
 import LoginRegister from './Page/LoginRegister';
 import Home from './Page/Home';
 import Profile from './Page/Profile';

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from './ThemeContext';
 import '../App.css';
-import Header from '../components/Header';
+import Header from '../Components/Header';
 import axios from 'axios';
 
 function Notification() {

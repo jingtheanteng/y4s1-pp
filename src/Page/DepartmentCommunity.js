@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { CgAttachment } from "react-icons/cg";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import '../App.css';
-import Header from '../components/Header';
+import Header from '../Components/Header';
 import { useTheme } from './ThemeContext';
 
 function DepartmentCommunity() {

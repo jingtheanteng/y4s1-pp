@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../../components/Header';
-import AdminSidebar from '../components/AdminSidebar';
+import Header from '../../Components/Header';
+import AdminSidebar from '../Component/AdminSidebar';
 import { FaSearch, FaEye, FaTrash, FaFilter, FaFlag, FaUser, FaClipboard, FaCheck, FaTimes } from 'react-icons/fa';
 
 function ReportList() {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../App.css';
-import Header from '../components/Header';
+import Header from '../Components/Header';
 import { useTheme } from './ThemeContext';
 
 function ForgetPassword() {

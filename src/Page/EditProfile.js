@@ -3,8 +3,9 @@ import { FaStar } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import { RiArrowDropDownLine } from "react-icons/ri";
 import '../App.css';
-import Header from '../components/Header';
+import Header from '../Components/Header';
 import { useTheme } from './ThemeContext';
+import { validateSession } from '../utils/auth';
 
 function EditProfile() {
     const [profilePicture, setProfilePicture] = useState(null);
@@ -26,26 +27,12 @@ function EditProfile() {
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
-                // Get session token from localStorage
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    navigate('/loginregister');
-                    return;
-                }
-
-                // First validate the session
-                const validateResponse = await fetch('http://localhost:5001/session/validate', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ token })
-                });
-
-                const validateData = await validateResponse.json();
-                
-                if (!validateData.status || !validateData.data.valid) {
-                    localStorage.removeItem('token');
+                // Validate session
+                const session = await validateSession();
+                if (!session.valid) {
+                    if (session.banned) {
+                        alert('This account has been banned');
+                    }
                     navigate('/loginregister');
                     return;
                 }
@@ -55,7 +42,7 @@ function EditProfile() {
                 const userData = await userResponse.json();
 
                 if (userData.status === 'success' && userData.data) {
-                    const currentUser = userData.data.find(user => user.id === validateData.data.user_id);
+                    const currentUser = userData.data.find(user => user.id === session.user_id);
                     if (currentUser) {
                         setFormData({
                             name: currentUser.name || '',

@@ -5,7 +5,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa"; // Added icons
 import { FaUserLarge} from "react-icons/fa6";
 import { MdEmail} from "react-icons/md";
 import '../App.css';
-import Header from '../components/Header';
+import Header from '../Components/Header';
 import { useTheme } from './ThemeContext';
 
 const LoginRegister = () => {

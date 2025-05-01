@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../../components/Header';
-import AdminSidebar from '../components/AdminSidebar';
-import { FaSearch, FaEdit, FaTrash, FaEye, FaSave, FaTimes } from 'react-icons/fa';
+import Header from '../../Components/Header';
+import AdminSidebar from '../Component/AdminSidebar';
+import { FaSearch, FaEdit, FaTrash, FaEye, FaSave, FaTimes, FaUnlock, FaLock } from 'react-icons/fa';
 
 function UserList() {
   const [users, setUsers] = useState([]);
@@ -75,6 +75,60 @@ function UserList() {
     } catch (error) {
       console.error("Error deleting user:", error);
       alert('An error occurred while deleting the user. Please try again.');
+    }
+  };
+
+  const handleBanUser = async (userId) => {
+    try {
+      const response = await fetch(`${API_URL}/user/ban/${userId}`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.status === true) {
+        // Update local state
+        setUsers(users.map(user => 
+          user.id === userId ? { ...user, banned: true } : user
+        ));
+        alert('User banned successfully');
+      } else {
+        throw new Error(result.message || 'Failed to ban user');
+      }
+    } catch (error) {
+      console.error("Error banning user:", error);
+      alert('An error occurred while banning the user. Please try again.');
+    }
+  };
+
+  const handleUnbanUser = async (userId) => {
+    try {
+      const response = await fetch(`${API_URL}/user/unban/${userId}`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.status === true) {
+        // Update local state
+        setUsers(users.map(user => 
+          user.id === userId ? { ...user, banned: false } : user
+        ));
+        alert('User unbanned successfully');
+      } else {
+        throw new Error(result.message || 'Failed to unban user');
+      }
+    } catch (error) {
+      console.error("Error unbanning user:", error);
+      alert('An error occurred while unbanning the user. Please try again.');
     }
   };
 
@@ -383,6 +437,23 @@ function UserList() {
                               >
                                 <FaEdit />
                               </button>
+                              {user.banned ? (
+                                <button 
+                                  className="text-yellow-500 hover:text-yellow-700"
+                                  title="Unban User"
+                                  onClick={() => handleUnbanUser(user.id)}
+                                >
+                                  <FaUnlock />
+                                </button>
+                              ) : (
+                                <button 
+                                  className="text-red-500 hover:text-red-700"
+                                  title="Ban User"
+                                  onClick={() => handleBanUser(user.id)}
+                                >
+                                  <FaLock />
+                                </button>
+                              )}
                               <button 
                                 className="text-red-500 hover:text-red-700"
                                 title="Delete"

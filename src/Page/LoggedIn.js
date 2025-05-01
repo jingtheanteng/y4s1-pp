@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { CgAttachment } from "react-icons/cg";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import '../App.css';
-import Header from '../components/Header';
+import Header from '../Components/Header';
 
 function LoggedIn() {
     const [likedCards, setLikedCards] = useState([false, false, false, false]); // Array to track heart icons for each card

@@ -3,6 +3,7 @@ import { FaSearch, FaBell, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../Page/ThemeContext';
 import axios from 'axios';
+import { validateSession } from '../utils/auth';
 
 function Header() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -17,24 +18,42 @@ function Header() {
 
     // Check login status from localStorage
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        const user = localStorage.getItem('user');
-        
-        if (token && user) {
-            try {
-                const parsedUser = JSON.parse(user);
-                setUserData(parsedUser);
-                setIsLoggedIn(true);
-                // Fetch unread notifications when user is logged in
-                fetchUnreadNotifications(parsedUser.id);
-            } catch (error) {
-                console.error("Error parsing user data:", error);
-                // Clear invalid data
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
+        const checkSession = async () => {
+            const token = localStorage.getItem('token');
+            const user = localStorage.getItem('user');
+            
+            if (token && user) {
+                try {
+                    const session = await validateSession();
+                    if (!session.valid) {
+                        if (session.banned) {
+                            alert('This account has been banned');
+                        }
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        setIsLoggedIn(false);
+                        setUserData(null);
+                        navigate('/loginregister');
+                        return;
+                    }
+
+                    const parsedUser = JSON.parse(user);
+                    setUserData(parsedUser);
+                    setIsLoggedIn(true);
+                    // Fetch unread notifications when user is logged in
+                    fetchUnreadNotifications(parsedUser.id);
+                } catch (error) {
+                    console.error("Error checking session:", error);
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    setIsLoggedIn(false);
+                    setUserData(null);
+                }
             }
-        }
-    }, [location]); // Re-check when location changes
+        };
+
+        checkSession();
+    }, [location, navigate]);
 
     const fetchUnreadNotifications = async (userId) => {
         try {

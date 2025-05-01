@@ -44,6 +44,7 @@ function EditProfile() {
                 if (userData.status === 'success' && userData.data) {
                     const currentUser = userData.data.find(user => user.id === session.user_id);
                     if (currentUser) {
+                        console.log('Edit Profile Data:', currentUser); // Debug log
                         setFormData({
                             name: currentUser.name || '',
                             bio: currentUser.bio || '',
@@ -51,8 +52,12 @@ function EditProfile() {
                             address: currentUser.address || '',
                             phone: currentUser.phone || '',
                             city: currentUser.city || '',
-                            department: currentUser.department || ''
+                            department: currentUser.department || '',
+                            profile_picture: currentUser.profile_picture || ''
                         });
+                        if (currentUser.profile_picture) {
+                            setProfilePicture(currentUser.profile_picture);
+                        }
                     }
                 }
             } catch (error) {
@@ -75,7 +80,13 @@ function EditProfile() {
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
-                setProfilePicture(reader.result);
+                const base64String = reader.result;
+                console.log('Base64 Image:', base64String.substring(0, 100) + '...');
+                setProfilePicture(base64String);
+                setFormData(prev => ({
+                    ...prev,
+                    profile_picture: base64String
+                }));
             };
             reader.readAsDataURL(file);
         }
@@ -101,15 +112,22 @@ function EditProfile() {
                 return;
             }
 
+            const requestData = {
+                ...formData,
+                profile_picture: profilePicture
+            };
+            console.log('Submitting profile data:', requestData);
+
             const response = await fetch('http://localhost:5001/user/update-profile', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(requestData)
             });
 
             const data = await response.json();
+            console.log('Update response:', data);
 
             if (data.status === true) {
                 setSuccess(true);

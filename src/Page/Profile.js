@@ -31,7 +31,8 @@ function Profile() {
                 if (userData.status === 'success' && userData.data) {
                     const currentUser = userData.data.find(user => user.id === session.user_id);
                     if (currentUser) {
-                        console.log('Current user points:', currentUser.points); // Debug log
+                        console.log('Profile Data:', currentUser); // Debug log
+                        console.log('Profile Picture:', currentUser.profile_picture); // Debug log
                         setProfileData(currentUser);
                         // Update the user data in localStorage
                         localStorage.setItem('user', JSON.stringify(currentUser));
@@ -64,11 +65,15 @@ function Profile() {
                     <main className={`flex-1 rounded-lg p-8 shadow-lg ${theme === "dark" ? "bg-gray-800" : "bg-white"}`}>
                         <div className="flex flex-col items-center lg:flex-row lg:items-start mb-6">
                             <img
-                                src={profileData?.profile_picture 
-                                    ? `http://localhost:5001/uploads/${profileData.profile_picture}`
+                                src={profileData?.profile_picture && profileData.profile_picture !== 'null' && profileData.profile_picture !== 'undefined'
+                                    ? profileData.profile_picture
                                     : "./images/default-profile.jpg"}
                                 alt="Profile"
                                 className="w-24 h-24 rounded-full object-cover mb-4 lg:mb-0 lg:mr-4"
+                                onError={(e) => {
+                                    console.log('Image load error:', e);
+                                    e.target.src = "./images/default-profile.jpg";
+                                }}
                             />
                             <div className="text-center lg:text-left">
                                 <h2 className={`text-3xl font-semibold mt-6 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>

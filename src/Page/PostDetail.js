@@ -360,7 +360,7 @@ function PostDetail() {
             <div className="mt-4 flex items-center space-x-3">
               {post?.profile_picture ? (
                 <img
-                  src={`http://localhost:5001/uploads/${post.profile_picture}`}
+                  src={post.profile_picture.startsWith('data:image') ? post.profile_picture : `http://localhost:5001/uploads/${post.profile_picture}`}
                   alt="User Avatar"
                   className="w-10 h-10 rounded-full cursor-pointer object-cover"
                   onClick={(e) => {
@@ -450,7 +450,7 @@ function PostDetail() {
               <div className="mt-4 flex items-center space-x-3">
                 {comment.profile_picture ? (
                   <img
-                    src={`http://localhost:5001/uploads/${comment.profile_picture}`}
+                    src={comment.profile_picture.startsWith('data:image') ? comment.profile_picture : `http://localhost:5001/uploads/${comment.profile_picture}`}
                     alt="User Avatar"
                     className="w-10 h-10 rounded-full cursor-pointer object-cover"
                     onClick={(e) => {
@@ -532,7 +532,7 @@ function PostDetail() {
                   <div className="flex items-center space-x-3">
                     {reply.profile_picture ? (
                       <img
-                        src={`http://localhost:5001/uploads/${reply.profile_picture}`}
+                        src={reply.profile_picture.startsWith('data:image') ? reply.profile_picture : `http://localhost:5001/uploads/${reply.profile_picture}`}
                         alt="User Avatar"
                         className="w-8 h-8 rounded-full cursor-pointer object-cover"
                         onClick={(e) => {

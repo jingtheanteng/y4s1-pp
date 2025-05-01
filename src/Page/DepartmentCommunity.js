@@ -157,7 +157,7 @@ function DepartmentCommunity() {
                             const user = JSON.parse(localStorage.getItem('user'));
                             return user?.profile_picture ? (
                                 <img
-                                    src={`http://localhost:5001/uploads/${user.profile_picture}`}
+                                    src={user.profile_picture.startsWith('data:image') ? user.profile_picture : `http://localhost:5001/uploads/${user.profile_picture}`}
                                     alt="User Avatar"
                                     className="w-10 h-10 rounded-full object-cover"
                                 />
@@ -277,7 +277,7 @@ function DepartmentCommunity() {
                                 <div className="flex items-center space-x-3">
                                     {post.profile_picture ? (
                                         <img
-                                            src={`http://localhost:5001/uploads/${post.profile_picture}`}
+                                            src={post.profile_picture.startsWith('data:image') ? post.profile_picture : `http://localhost:5001/uploads/${post.profile_picture}`}
                                             alt="User Avatar"
                                             className="w-10 h-10 rounded-full cursor-pointer object-cover"
                                             onClick={(e) => {

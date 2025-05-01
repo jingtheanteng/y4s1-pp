@@ -317,9 +317,24 @@ function Home() {
                         <div className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} p-4 rounded-md mb-6 flex flex-col items-start shadow-lg`}>
                             <div className="flex items-center mb-4 w-full">
                                 {/* User avatar for new post */}
-                                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                    <span className="text-gray-500 text-xs">No Photo</span>
-                                </div>
+                                {(() => {
+                                    const user = JSON.parse(localStorage.getItem('user'));
+                                    if (user && user.profile_picture) {
+                                        return (
+                                            <img
+                                                src={user.profile_picture.startsWith('data:image') ? user.profile_picture : `http://localhost:5001/uploads/${user.profile_picture}`}
+                                                alt="User Avatar"
+                                                className="w-10 h-10 rounded-full object-cover"
+                                            />
+                                        );
+                                    } else {
+                                        return (
+                                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                                                <span className="text-gray-500 text-xs">No Photo</span>
+                                            </div>
+                                        );
+                                    }
+                                })()}
                                 <input
                                     type="text"
                                     name="name"
@@ -483,7 +498,7 @@ function Home() {
                                             <div className="flex items-center space-x-3">
                                                 {post.profile_picture ? (
                                                     <img
-                                                        src={`http://localhost:5001/uploads/${post.profile_picture}`}
+                                                        src={post.profile_picture.startsWith('data:image') ? post.profile_picture : `http://localhost:5001/uploads/${post.profile_picture}`}
                                                         alt="User Avatar"
                                                         className="w-10 h-10 rounded-full object-cover"
                                                     />

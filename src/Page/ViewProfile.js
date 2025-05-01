@@ -122,7 +122,7 @@ function ViewProfile() {
                             {/* Profile Picture */}
                             {user.profile_picture ? (
                                 <img
-                                    src={`http://localhost:5001/uploads/${user.profile_picture}`}
+                                    src={user.profile_picture.startsWith('data:image') ? user.profile_picture : `http://localhost:5001/uploads/${user.profile_picture}`}
                                     alt="Profile"
                                     className="w-32 h-32 rounded-full object-cover mb-4 border-4 border-orange-500"
                                 />

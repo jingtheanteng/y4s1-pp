@@ -11,8 +11,15 @@ function Header() {
     const navigate = useNavigate();
     const location = useLocation();
     const [isDropdownVisible, setDropdownVisible] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userData, setUserData] = useState(null);
+    const [isLoggedIn, setIsLoggedIn] = useState(() => {
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+        return !!(token && user);
+    });
+    const [userData, setUserData] = useState(() => {
+        const user = localStorage.getItem('user');
+        return user ? JSON.parse(user) : null;
+    });
     const [unreadNotifications, setUnreadNotifications] = useState(0);
     const { theme } = useTheme();
     const [searchResults, setSearchResults] = useState([]);
@@ -52,6 +59,9 @@ function Header() {
                     setIsLoggedIn(false);
                     setUserData(null);
                 }
+            } else {
+                setIsLoggedIn(false);
+                setUserData(null);
             }
         };
 
@@ -251,7 +261,7 @@ function Header() {
                                 <div className="w-9 h-9 border-2 rounded-full flex items-center justify-center">
                                     {userData.profile_picture ? (
                                         <img 
-                                            src={`http://localhost:5001/uploads/${userData.profile_picture}`}
+                                            src={userData.profile_picture.startsWith('data:image') ? userData.profile_picture : `http://localhost:5001/uploads/${userData.profile_picture}`}
                                             alt="Profile Icon" 
                                             className="w-8 h-8 rounded-full object-cover" 
                                         />
@@ -269,7 +279,7 @@ function Header() {
                                     <div className="flex items-center px-4 py-4">
                                         {userData.profile_picture ? (
                                             <img 
-                                                src={`http://localhost:5001/uploads/${userData.profile_picture}`}
+                                                src={userData.profile_picture.startsWith('data:image') ? userData.profile_picture : `http://localhost:5001/uploads/${userData.profile_picture}`}
                                                 alt="User Avatar" 
                                                 className="w-12 h-12 rounded-full mr-4 object-cover" 
                                             />

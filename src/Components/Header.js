@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { FaSearch, FaBell, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../Page/ThemeContext';
-import axios from 'axios';
 import { validateSession } from '../utils/auth';
 
 function Header() {
@@ -70,9 +69,10 @@ function Header() {
 
     const fetchUnreadNotifications = async (userId) => {
         try {
-            const response = await axios.get(`http://localhost:5001/notifications/${userId}`);
-            if (response.data.status) {
-                const unreadCount = response.data.data.filter(notification => !notification.is_read).length;
+            const response = await fetch(`http://localhost:5001/notifications/${userId}`);
+            const data = await response.json();
+            if (data.status) {
+                const unreadCount = data.data.filter(notification => !notification.is_read).length;
                 setUnreadNotifications(unreadCount);
             }
         } catch (error) {
@@ -123,9 +123,10 @@ function Header() {
         }
 
         try {
-            const response = await axios.get(`http://localhost:5001/search?q=${encodeURIComponent(query)}`);
-            if (response.data.status) {
-                setSearchResults(response.data.data);
+            const response = await fetch(`http://localhost:5001/search?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            if (data.status) {
+                setSearchResults(data.data);
                 setShowSearchResults(true);
             }
         } catch (error) {
@@ -264,11 +265,16 @@ function Header() {
                                             src={userData.profile_picture.startsWith('data:image') ? userData.profile_picture : `http://localhost:5001/uploads/${userData.profile_picture}`}
                                             alt="Profile Icon" 
                                             className="w-8 h-8 rounded-full object-cover" 
+                                            onError={(e) => {
+                                                e.target.src = "/images/default-profile.jpg";
+                                            }}
                                         />
                                     ) : (
-                                        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                                            <span className="text-gray-500 text-xs">No Photo</span>
-                                        </div>
+                                        <img 
+                                            src="/images/default-profile.jpg"
+                                            alt="Profile Icon" 
+                                            className="w-8 h-8 rounded-full object-cover" 
+                                        />
                                     )}
                                 </div>
                             </div>
@@ -282,11 +288,16 @@ function Header() {
                                                 src={userData.profile_picture.startsWith('data:image') ? userData.profile_picture : `http://localhost:5001/uploads/${userData.profile_picture}`}
                                                 alt="User Avatar" 
                                                 className="w-12 h-12 rounded-full mr-4 object-cover" 
+                                                onError={(e) => {
+                                                    e.target.src = "/images/default-profile.jpg";
+                                                }}
                                             />
                                         ) : (
-                                            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center mr-4">
-                                                <span className="text-gray-500 text-xs">No Photo</span>
-                                            </div>
+                                            <img 
+                                                src="/images/default-profile.jpg"
+                                                alt="User Avatar" 
+                                                className="w-12 h-12 rounded-full mr-4 object-cover" 
+                                            />
                                         )}
                                         <div>
                                             <p className="font-medium text-lg">{userData.name || 'User'}</p>

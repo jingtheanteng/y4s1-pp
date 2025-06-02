@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from './ThemeContext';
 import '../App.css';
 import Header from '../Components/Header';
-import axios from 'axios';
 
 function Notification() {
     const navigate = useNavigate();
@@ -15,7 +14,6 @@ function Notification() {
     useEffect(() => {
         const fetchNotifications = async () => {
             try {
-                // Get user data from localStorage
                 const userData = JSON.parse(localStorage.getItem('user'));
                 
                 if (!userData || !userData.id) {
@@ -24,10 +22,11 @@ function Notification() {
                     return;
                 }
 
-                const response = await axios.get(`http://localhost:5001/notifications/${userData.id}`);
+                const response = await fetch(`http://localhost:5001/notifications/${userData.id}`);
+                const data = await response.json();
                 
-                if (response.data.status) {
-                    setNotifications(response.data.data || []);
+                if (data.status) {
+                    setNotifications(data.data || []);
                 }
             } catch (error) {
                 console.error('Error fetching notifications:', error);
@@ -42,7 +41,9 @@ function Notification() {
     const handlePostClick = async (postId, notificationId) => {
         try {
             // Mark notification as read
-            await axios.put(`http://localhost:5001/notifications/${notificationId}/read`);
+            await fetch(`http://localhost:5001/notifications/${notificationId}/read`, {
+                method: 'PUT'
+            });
             
             // Navigate to post detail page
             navigate(`/post-detail/${postId}`);
@@ -58,9 +59,12 @@ function Notification() {
             if (!userData || !userData.id) return;
             
             setClearing(true);
-            const response = await axios.delete(`http://localhost:5001/notifications/${userData.id}/clear`);
+            const response = await fetch(`http://localhost:5001/notifications/${userData.id}/clear`, {
+                method: 'DELETE'
+            });
+            const data = await response.json();
             
-            if (response.data.status) {
+            if (data.status) {
                 setNotifications([]);
             }
         } catch (error) {

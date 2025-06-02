@@ -20,7 +20,8 @@ function UserList() {
     address: '',
     phone: '',
     city: '',
-    department: ''
+    department: '',
+    admin: false
   });
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
@@ -160,7 +161,8 @@ function UserList() {
           name: editingUser.name,
           bio: editingUser.bio,
           address: editingUser.address,
-          phone: editingUser.phone
+          phone: editingUser.phone,
+          admin: editingUser.admin
         }),
       });
 
@@ -231,7 +233,8 @@ function UserList() {
           address: '',
           phone: '',
           city: '',
-          department: ''
+          department: '',
+          admin: false
         });
         alert('User created successfully');
       } else {
@@ -416,6 +419,23 @@ function UserList() {
                         rows="3"
                       ></textarea>
                     </div>
+                    <div className="md:col-span-2">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          name="admin"
+                          checked={editingUser.admin || false}
+                          onChange={(e) => {
+                            setEditingUser(prev => ({
+                              ...prev,
+                              admin: e.target.checked
+                            }));
+                          }}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-700">Admin Access</span>
+                      </label>
+                    </div>
                   </div>
                   
                   <div className="flex justify-end space-x-2">
@@ -558,6 +578,23 @@ function UserList() {
                         rows="3"
                       ></textarea>
                     </div>
+                    <div className="md:col-span-2">
+                      <label className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          name="admin"
+                          checked={newUser.admin || false}
+                          onChange={(e) => {
+                            setNewUser(prev => ({
+                              ...prev,
+                              admin: e.target.checked
+                            }));
+                          }}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="text-sm font-medium text-gray-700">Admin Access</span>
+                      </label>
+                    </div>
                   </div>
                   
                   <div className="flex justify-end space-x-2">
@@ -598,6 +635,7 @@ function UserList() {
                         <th className="py-3 px-4 text-left">Bio</th>
                         <th className="py-3 px-4 text-left">Phone</th>
                         <th className="py-3 px-4 text-left">Address</th>
+                        <th className="py-3 px-4 text-left">Admin</th>
                         <th className="py-3 px-4 text-left">Actions</th>
                       </tr>
                     </thead>
@@ -613,6 +651,13 @@ function UserList() {
                           <td className="py-3 px-4">{user.phone || '-'}</td>
                           <td className="py-3 px-4">
                             <div className="max-w-xs truncate">{user.address || '-'}</div>
+                          </td>
+                          <td className="py-3 px-4">
+                            {user.admin ? (
+                              <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Admin</span>
+                            ) : (
+                              <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs">User</span>
+                            )}
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex space-x-2">

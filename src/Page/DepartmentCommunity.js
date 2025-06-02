@@ -284,17 +284,20 @@ function DepartmentCommunity() {
                                                 e.stopPropagation();
                                                 navigate(`/viewprofile/${post.owner_id}`);
                                             }}
+                                            onError={(e) => {
+                                                e.target.src = "./images/default-profile.jpg";
+                                            }}
                                         />
                                     ) : (
-                                        <div 
-                                            className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer"
+                                        <img
+                                            src="/images/default-profile.jpg"
+                                            alt="User Avatar"
+                                            className="w-10 h-10 rounded-full cursor-pointer object-cover"
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 navigate(`/viewprofile/${post.owner_id}`);
                                             }}
-                                        >
-                                            <span className="text-gray-500 text-xs">No Photo</span>
-                                        </div>
+                                        />
                                     )}
                                     <div>
                                         <p className={`${theme === 'dark' ? 'text-white' : 'text-black'} text-sm font-semibold`}>

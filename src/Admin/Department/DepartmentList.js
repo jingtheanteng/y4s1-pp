@@ -279,6 +279,22 @@ function DepartmentList() {
                 <h2 className="text-lg font-semibold mb-3">Add New Department</h2>
                 <div className="grid grid-cols-1 gap-4">
                   <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Faculty</label>
+                    <select
+                      name="faculty_id"
+                      className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      value={newDepartment.faculty_id}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Select a faculty</option>
+                      {faculties.map(faculty => (
+                        <option key={faculty.id} value={faculty.id}>
+                          {faculty.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                     <input
                       type="text"
@@ -300,22 +316,7 @@ function DepartmentList() {
                       rows="3"
                     ></textarea>
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Faculty</label>
-                    <select
-                      name="faculty_id"
-                      className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      value={newDepartment.faculty_id}
-                      onChange={handleInputChange}
-                    >
-                      <option value="">Select a faculty</option>
-                      {faculties.map(faculty => (
-                        <option key={faculty.id} value={faculty.id}>
-                          {faculty.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  
                   <div className="flex justify-end space-x-2 mt-2">
                     <button
                       className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"

@@ -8,6 +8,7 @@ import ReportPopup from './Report'; // Import the Popup component
 import '../App.css';
 import Header from '../Components/Header';
 import { useTheme } from './ThemeContext';
+import { CgAttachment } from "react-icons/cg";
 
 function PostDetail() {
   const navigate = useNavigate();
@@ -367,17 +368,20 @@ function PostDetail() {
                     e.stopPropagation();
                     navigate(`/viewprofile/${post?.owner_id}`);
                   }}
+                  onError={(e) => {
+                    e.target.src = "/images/default-profile.jpg";
+                  }}
                 />
               ) : (
-                <div 
-                  className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer"
+                <img
+                  src="/images/default-profile.jpg"
+                  alt="User Avatar"
+                  className="w-10 h-10 rounded-full cursor-pointer object-cover"
                   onClick={(e) => {
                     e.stopPropagation();
                     navigate(`/viewprofile/${post?.owner_id}`);
                   }}
-                >
-                  <span className="text-gray-500 text-xs">No Photo</span>
-                </div>
+                />
               )}
               <div>
                 <p className={`text-sm font-semibold ${
@@ -403,6 +407,35 @@ function PostDetail() {
               <p className={theme === "dark" ? "text-gray-300" : "text-gray-700"}>
                 {post?.description}
               </p>
+              
+              {/* Add Attachments Section */}
+              {post?.attachments && post.attachments.length > 0 && (
+                  <div className="mt-4">
+                      <h4 className={`text-sm font-semibold mb-2 ${
+                          theme === "dark" ? "text-gray-300" : "text-gray-700"
+                      }`}>
+                          Attachments:
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                          {post.attachments.map((attachment, index) => (
+                              <a
+                                  key={index}
+                                  href={`http://localhost:5001/uploads/${attachment.file_path}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${
+                                      theme === "dark" 
+                                      ? "bg-gray-700 text-gray-200 hover:bg-gray-600" 
+                                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                  } transition-colors`}
+                              >
+                                  <CgAttachment className="h-4 w-4" />
+                                  <span className="truncate max-w-[150px]">{attachment.file_name}</span>
+                              </a>
+                          ))}
+                      </div>
+                  </div>
+              )}
             </div>
             
             <div className="flex space-x-4 mt-4">
@@ -457,17 +490,20 @@ function PostDetail() {
                       e.stopPropagation();
                       navigate(`/viewprofile/${comment.owner_id}`);
                     }}
+                    onError={(e) => {
+                      e.target.src = "/images/default-profile.jpg";
+                    }}
                   />
                 ) : (
-                  <div 
-                    className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer"
+                  <img
+                    src="/images/default-profile.jpg"
+                    alt="User Avatar"
+                    className="w-10 h-10 rounded-full cursor-pointer object-cover"
                     onClick={(e) => {
                       e.stopPropagation();
                       navigate(`/viewprofile/${comment.owner_id}`);
                     }}
-                  >
-                    <span className="text-gray-500 text-xs">No Photo</span>
-                  </div>
+                  />
                 )}
                 <div>
                   <p className={`text-sm font-semibold ${
@@ -539,17 +575,20 @@ function PostDetail() {
                           e.stopPropagation();
                           navigate(`/viewprofile/${reply.owner_id}`);
                         }}
+                        onError={(e) => {
+                          e.target.src = "/images/default-profile.jpg";
+                        }}
                       />
                     ) : (
-                      <div 
-                        className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer"
+                      <img
+                        src="/images/default-profile.jpg"
+                        alt="User Avatar"
+                        className="w-8 h-8 rounded-full cursor-pointer object-cover"
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/viewprofile/${reply.owner_id}`);
                         }}
-                      >
-                        <span className="text-gray-500 text-xs">No Photo</span>
-                      </div>
+                      />
                     )}
                     <div>
                       <div className="flex items-center space-x-1">

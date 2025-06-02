@@ -24,7 +24,8 @@ function Home() {
         name: '',
         description: '',
         department_id: '',
-        category_id: ''
+        category_id: '',
+        attachments: []
     });
     const navigate = useNavigate();
     const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
@@ -155,15 +156,21 @@ function Home() {
                 return;
             }
 
+            const formData = new FormData();
+            formData.append('name', newPost.name);
+            formData.append('description', newPost.description);
+            formData.append('department_id', newPost.department_id);
+            formData.append('category_id', newPost.category_id);
+            formData.append('owner_id', session.user_id);
+            
+            // Append each file with the correct field name 'files'
+            newPost.attachments.forEach((file) => {
+                formData.append('files', file); // Changed from 'attachments' to 'files'
+            });
+
             const response = await fetch('http://localhost:5001/post', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    ...newPost,
-                    owner_id: session.user_id
-                }),
+                body: formData,
             });
 
             if (!response.ok) {
@@ -178,10 +185,14 @@ function Home() {
                     name: '',
                     description: '',
                     department_id: '',
-                    category_id: ''
+                    category_id: '',
+                    attachments: []
                 });
                 setCurrentPage(1); // Reset to first page after creating new post
                 fetchPosts();
+
+                // Show success message with points earned
+                alert(`Post created successfully! You earned ${data.data.points - (data.data.points - 5)} points!`);
 
                 // Refresh user data to update points
                 const userResponse = await fetch('http://localhost:5001/user');
@@ -213,6 +224,46 @@ function Home() {
         setNewPost(prev => ({
             ...prev,
             [name]: value
+        }));
+    };
+
+    const handleFileChange = (e) => {
+        const files = Array.from(e.target.files);
+        const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+        const MAX_FILES = 5;
+        const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+        // Check number of files
+        if (newPost.attachments.length + files.length > MAX_FILES) {
+            alert(`You can only upload up to ${MAX_FILES} files`);
+            return;
+        }
+
+        // Filter and validate files
+        const validFiles = files.filter(file => {
+            if (file.size > MAX_FILE_SIZE) {
+                alert(`File ${file.name} is too large. Maximum size is 5MB`);
+                return false;
+            }
+            if (!ALLOWED_TYPES.includes(file.type)) {
+                alert(`File ${file.name} is not an allowed file type`);
+                return false;
+            }
+            return true;
+        });
+
+        if (validFiles.length > 0) {
+            setNewPost(prev => ({
+                ...prev,
+                attachments: [...prev.attachments, ...validFiles]
+            }));
+        }
+    };
+
+    const removeAttachment = (indexToRemove) => {
+        setNewPost(prev => ({
+            ...prev,
+            attachments: prev.attachments.filter((_, index) => index !== indexToRemove)
         }));
     };
 
@@ -325,13 +376,18 @@ function Home() {
                                                 src={user.profile_picture.startsWith('data:image') ? user.profile_picture : `http://localhost:5001/uploads/${user.profile_picture}`}
                                                 alt="User Avatar"
                                                 className="w-10 h-10 rounded-full object-cover"
+                                                onError={(e) => {
+                                                    e.target.src = "/images/default-profile.jpg";
+                                                }}
                                             />
                                         );
                                     } else {
                                         return (
-                                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                                <span className="text-gray-500 text-xs">No Photo</span>
-                                            </div>
+                                            <img
+                                                src="/images/default-profile.jpg"
+                                                alt="User Avatar"
+                                                className="w-10 h-10 rounded-full object-cover"
+                                            />
                                         );
                                     }
                                 })()}
@@ -368,6 +424,35 @@ function Home() {
                                     }`}
                                     rows="3"
                                 />
+                                
+                                {/* Attachment pills section */}
+                                {newPost.attachments.length > 0 && (
+                                    <div className="mt-3 flex flex-wrap gap-2">
+                                        {newPost.attachments.map((file, index) => (
+                                            <div 
+                                                key={index} 
+                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${
+                                                    theme === "dark" 
+                                                    ? "bg-gray-700 text-gray-200" 
+                                                    : "bg-gray-100 text-gray-700"
+                                                }`}
+                                            >
+                                                <CgAttachment className="h-4 w-4" />
+                                                <span className="truncate max-w-[150px]">{file.name}</span>
+                                                <button
+                                                    onClick={() => removeAttachment(index)}
+                                                    className={`p-0.5 rounded-full hover:bg-opacity-80 ${
+                                                        theme === "dark" 
+                                                        ? "hover:bg-gray-600" 
+                                                        : "hover:bg-gray-200"
+                                                    }`}
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                             <div className="flex items-center space-x-4 w-full">
@@ -378,9 +463,15 @@ function Home() {
                                         : "bg-white text-gray-900 border-gray-300"
                                     } border`}>
                                         <CgAttachment className="h-5 w-5 mr-2" />
-                                        Attachment
+                                        Add Attachments
                                     </label>
-                                    <input type="file" id="file-upload" className="hidden" />
+                                    <input 
+                                        type="file" 
+                                        id="file-upload" 
+                                        className="hidden" 
+                                        onChange={handleFileChange}
+                                        multiple
+                                    />
                                 </div>
 
                                 <div className="relative w-auto">
@@ -501,11 +592,16 @@ function Home() {
                                                         src={post.profile_picture.startsWith('data:image') ? post.profile_picture : `http://localhost:5001/uploads/${post.profile_picture}`}
                                                         alt="User Avatar"
                                                         className="w-10 h-10 rounded-full object-cover"
+                                                        onError={(e) => {
+                                                            e.target.src = "./images/default-profile.jpg";
+                                                        }}
                                                     />
                                                 ) : (
-                                                    <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                                        <span className="text-gray-500 text-xs">No Photo</span>
-                                                    </div>
+                                                    <img
+                                                        src="./images/default-profile.jpg"
+                                                        alt="User Avatar"
+                                                        className="w-10 h-10 rounded-full object-cover"
+                                                    />
                                                 )}
                                                 <div>
                                                     <p className={`text-sm font-semibold ${theme === "dark" ? "text-white" : "text-gray-900"}`}>

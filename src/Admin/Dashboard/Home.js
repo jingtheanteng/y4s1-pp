@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../../Components/Header';
 import AdminSidebar from '../Component/AdminSidebar';
 import { FaUsers, FaClipboard, FaFlag, FaClock, FaChartLine, FaExclamationTriangle, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
   const [statistics, setStatistics] = useState({
@@ -12,6 +13,19 @@ function Home() {
   });
   const [timeFilter, setTimeFilter] = useState('all');
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check admin status from localStorage
+    const userData = JSON.parse(localStorage.getItem('user'));
+    if (!userData || !userData.admin) {
+      navigate('/');
+      return;
+    }
+
+    // If user is admin, fetch statistics
+    fetchStatistics(timeFilter);
+  }, [timeFilter]);
 
   const fetchStatistics = async (filter) => {
     try {
@@ -28,10 +42,6 @@ function Home() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchStatistics(timeFilter);
-  }, [timeFilter]);
 
   const handleTimeFilterChange = (e) => {
     setTimeFilter(e.target.value);

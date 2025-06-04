@@ -57,6 +57,13 @@ function Profile() {
         return value || 'N/A';
     };
 
+    const handleLogOutClick = () => {
+        // Clear localStorage
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/');
+    };
+
     return (
         <div className={`min-h-screen flex flex-col ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
             <Header />
@@ -168,6 +175,15 @@ function Profile() {
                                 }`}>
                                     {profileData ? getFieldValue(profileData.department) : 'Loading...'}
                                 </p>
+                            </div>
+
+                            <div className="mt-6">
+                                <button
+                                    onClick={handleLogOutClick}
+                                    className="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors"
+                                >
+                                    Log Out
+                                </button>
                             </div>
                         </div>
                     </main>

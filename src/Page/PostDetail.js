@@ -420,9 +420,7 @@ function PostDetail() {
                           {post.attachments.map((attachment, index) => (
                               <a
                                   key={index}
-                                  href={`http://localhost:5001/uploads/${attachment.file_path}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
+                                  href={`http://localhost:5001/download/${attachment.file_path}`}
                                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm ${
                                       theme === "dark" 
                                       ? "bg-gray-700 text-gray-200 hover:bg-gray-600" 

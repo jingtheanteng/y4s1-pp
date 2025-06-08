@@ -165,7 +165,7 @@ function Home() {
             
             // Append each file with the correct field name 'files'
             newPost.attachments.forEach((file) => {
-                formData.append('files', file); // Changed from 'attachments' to 'files'
+                formData.append('files', file); // ✅ Each file is appended individually
             });
 
             const response = await fetch('http://localhost:5001/post', {
@@ -233,12 +233,6 @@ function Home() {
         const MAX_FILES = 5;
         const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
 
-        // Check number of files
-        if (newPost.attachments.length + files.length > MAX_FILES) {
-            alert(`You can only upload up to ${MAX_FILES} files`);
-            return;
-        }
-
         // Filter and validate files
         const validFiles = files.filter(file => {
             if (file.size > MAX_FILE_SIZE) {
@@ -252,6 +246,13 @@ function Home() {
             return true;
         });
 
+        // Check number of files
+        if (newPost.attachments.length + validFiles.length > MAX_FILES) {
+            alert(`You can only upload up to ${MAX_FILES} files`);
+            return;
+        }
+
+        // Add all valid files to existing attachments
         if (validFiles.length > 0) {
             setNewPost(prev => ({
                 ...prev,

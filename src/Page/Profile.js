@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FaStar } from "react-icons/fa6";
+import { FaStar, FaPenToSquare, FaTrash } from "react-icons/fa6";
 import { useNavigate } from 'react-router-dom';
 import '../App.css';
 import Header from '../Components/Header';
@@ -9,6 +9,7 @@ import { validateSession } from '../utils/auth';
 function Profile() {
     const navigate = useNavigate();
     const [profileData, setProfileData] = useState(null);
+    const [userPosts, setUserPosts] = useState([]);
     const { theme } = useTheme();
 
     useEffect(() => {
@@ -36,6 +37,13 @@ function Profile() {
                         setProfileData(currentUser);
                         // Update the user data in localStorage
                         localStorage.setItem('user', JSON.stringify(currentUser));
+                        
+                        // Fetch user's posts
+                        const postsResponse = await fetch(`http://localhost:5001/post?owner_id=${currentUser.id}`);
+                        const postsData = await postsResponse.json();
+                        if (postsData.status === true) {
+                            setUserPosts(postsData.data);
+                        }
                     }
                 }
             } catch (error) {
@@ -62,6 +70,54 @@ function Profile() {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         navigate('/');
+    };
+
+    const handleEditPost = (postId) => {
+        navigate(`/edit-post/${postId}`);
+    };
+
+    const handleDeletePost = async (postId) => {
+        if (window.confirm('Are you sure you want to delete this post?')) {
+            try {
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (!user) {
+                    throw new Error('User not logged in');
+                }
+
+                const response = await fetch(`http://localhost:5001/post/${postId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        owner_id: user.id
+                    }),
+                });
+
+                const data = await response.json();
+                if (data.status) {
+                    // Remove the deleted post from the state
+                    setUserPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+                    alert('Post deleted successfully');
+                } else {
+                    throw new Error(data.message || 'Failed to delete post');
+                }
+            } catch (error) {
+                console.error('Error deleting post:', error);
+                alert(error.message);
+            }
+        }
+    };
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
     };
 
     return (
@@ -187,6 +243,75 @@ function Profile() {
                             </div>
                         </div>
                     </main>
+                </div>
+
+                {/* User's Posts Section */}
+                <div className="mt-8 w-full lg:w-1/2 container mx-auto">
+                    <h3 className={`text-2xl font-semibold mb-4 ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                        My Posts
+                    </h3>
+                    <div className="space-y-4">
+                        {userPosts.length === 0 ? (
+                            <p className={`text-center ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                                You haven't created any posts yet.
+                            </p>
+                        ) : (
+                            userPosts.map(post => (
+                                <div
+                                    key={post.id}
+                                    className={`p-4 rounded-lg shadow-md ${
+                                        theme === "dark" ? "bg-gray-800" : "bg-white"
+                                    }`}
+                                >
+                                    <div className="flex justify-between items-start mb-2">
+                                        <h4 className={`text-lg font-semibold ${
+                                            theme === "dark" ? "text-white" : "text-gray-900"
+                                        }`}>
+                                            {post.name}
+                                        </h4>
+                                        <div className="flex space-x-2">
+                                            <button
+                                                onClick={() => handleEditPost(post.id)}
+                                                className="text-blue-500 hover:text-blue-600"
+                                            >
+                                                <FaPenToSquare />
+                                            </button>
+                                            <button
+                                                onClick={() => handleDeletePost(post.id)}
+                                                className="text-red-500 hover:text-red-600"
+                                            >
+                                                <FaTrash />
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <p className={`mb-2 ${
+                                        theme === "dark" ? "text-gray-300" : "text-gray-600"
+                                    }`}>
+                                        {post.description}
+                                    </p>
+                                    <div className="flex justify-between items-center text-sm">
+                                        <span className={`${
+                                            theme === "dark" ? "text-gray-400" : "text-gray-500"
+                                        }`}>
+                                            {formatDate(post.created_at)}
+                                        </span>
+                                        <div className="flex items-center space-x-4">
+                                            <span className={`${
+                                                theme === "dark" ? "text-gray-400" : "text-gray-500"
+                                            }`}>
+                                                {post.like_count} likes
+                                            </span>
+                                            <span className={`${
+                                                theme === "dark" ? "text-gray-400" : "text-gray-500"
+                                            }`}>
+                                                {post.comment_count} comments
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

@@ -21,6 +21,7 @@ import FacultyList from './Admin/Faculty/FacultyList';
 import PostList from './Admin/Post/PostList';
 import CommentList from './Admin/Comment/CommentList';
 import ReportList from './Admin/Report/ReportList';
+import EditPost from './Page/EditPost';
 
 function App() {
     return (
@@ -48,6 +49,7 @@ function App() {
                     <Route path="/post-detail/:id" element={<PostDetail />} />
                     <Route path="/viewprofile/:userId" element={<ViewProfile />} />
                     <Route path="/home-loggedin" element={<LoggedIn />} />
+                    <Route path="/edit-post/:id" element={<EditPost />} />
                 </Routes>
             </Router>
         </ThemeProvider>

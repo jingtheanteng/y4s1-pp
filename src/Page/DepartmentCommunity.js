@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { FaHeart } from "react-icons/fa";
 import { useNavigate, useParams } from 'react-router-dom';
 import { CgAttachment } from "react-icons/cg";
 import { RiArrowDropDownLine } from "react-icons/ri";
@@ -259,15 +258,6 @@ function DepartmentCommunity() {
                                             {post.name}
                                         </h3>
                                     </div>
-                                    <button 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            toggleHeart(post.id);
-                                        }} 
-                                        className="text-gray-400 hover:text-orange-500"
-                                    >
-                                        <FaHeart className={`text-xl ${likedCards[post.id] ? 'text-orange-500' : 'text-gray-400'}`} />
-                                    </button>
                                 </div>
 
                                 <span className={`${theme === 'dark' ? 'text-gray-300 bg-gray-700' : 'text-gray-600 bg-gray-100'} text-xs px-2 py-1 rounded-md w-fit`}>

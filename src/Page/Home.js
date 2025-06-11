@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { FaHeart } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
 import { CgAttachment } from "react-icons/cg";
 import { RiArrowDropDownLine } from "react-icons/ri";
@@ -554,15 +553,6 @@ function Home() {
                                                     {post.name}
                                                 </h3>
                                             </div>
-                                            <button 
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    toggleHeart(index);
-                                                }} 
-                                                className="hover:text-orange-500"
-                                            >
-                                                <FaHeart className={`text-xl ${likedCards[index] ? 'text-orange-500' : theme === "dark" ? 'text-gray-400' : 'text-gray-500'}`} />
-                                            </button>
                                         </div>
 
                                         <div className="flex space-x-2">

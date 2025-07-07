@@ -424,12 +424,7 @@ function PostList() {
                           <FaComment className="text-green-500 mr-1" /> {selectedPost.comment_count}
                         </span>
                       </div>
-                      <button
-                        className="flex items-center text-blue-500 hover:text-blue-700"
-                        onClick={() => handleLikePost(selectedPost.id)}
-                      >
-                        <FaThumbsUp className="mr-1" /> Like
-                      </button>
+                      
                     </div>
                     
                     <div className="text-sm text-gray-500 mb-2">

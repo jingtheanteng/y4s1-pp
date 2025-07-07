@@ -178,7 +178,9 @@ function Header() {
                                 <div className="absolute left-1/2 transform -translate-x-1/2 bg-white text-black rounded-md shadow-lg mt-2 w-full">
                                     <span className={`block cursor-pointer p-2 ${isHome ? 'text-orange-500' : 'hover:text-orange-500'}`} onClick={handleHomeClick}>Home</span>
                                     <span className={`block cursor-pointer p-2 ${isCommunities ? 'text-orange-500' : 'hover:text-orange-500'}`} onClick={handleCommunitiesClick}>Communities</span>
-                                    <span className={`block cursor-pointer p-2 ${isProfile ? 'text-orange-500' : 'hover:text-orange-500'}`} onClick={handleProfileClick}>Profile</span>
+                                    {isLoggedIn && (
+                                        <span className={`block cursor-pointer p-2 ${isProfile ? 'text-orange-500' : 'hover:text-orange-500'}`} onClick={handleProfileClick}>Profile</span>
+                                    )}
                                     <span className={`block cursor-pointer p-2 ${isSetting ? 'text-orange-500' : 'hover:text-orange-500'}`} onClick={handleSettingClick}>Settings</span>
                                     {!isLoggedIn && (
                                         <span className={`block cursor-pointer p-2 ${isSignIn ? 'text-orange-500' : 'hover:text-orange-500'}`} onClick={handleSignInClick}>Sign In</span>
@@ -190,7 +192,9 @@ function Header() {
                         <nav className="hidden lg:flex items-center justify-center space-x-12">
                             <span className={`cursor-pointer text-lg font-bold ${isHome ? 'text-orange-500' : 'text-white hover:text-orange-500'}`} onClick={handleHomeClick}>Home</span>
                             <span className={`cursor-pointer text-lg font-bold ${isCommunities ? 'text-orange-500' : 'text-white hover:text-orange-500'}`} onClick={handleCommunitiesClick}>Communities</span>
-                            <span className={`cursor-pointer text-lg font-bold ${isProfile ? 'text-orange-500' : 'text-white hover:text-orange-500'}`} onClick={handleProfileClick}>Profile</span>
+                            {isLoggedIn && (
+                                <span className={`cursor-pointer text-lg font-bold ${isProfile ? 'text-orange-500' : 'text-white hover:text-orange-500'}`} onClick={handleProfileClick}>Profile</span>
+                            )}
                             <span className={`cursor-pointer text-lg font-bold ${isSetting ? 'text-orange-500' : 'text-white hover:text-orange-500'}`} onClick={handleSettingClick}>Settings</span>
                             {!isLoggedIn && (
                                 <span className={`cursor-pointer text-lg font-bold ${isSignIn ? 'text-orange-500' : 'text-white hover:text-orange-500'}`} onClick={handleSignInClick}>Sign In</span>
